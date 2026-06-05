@@ -24,10 +24,9 @@ The tools are designed to be used in sequence, with the Process Mining Visualize
 
 ```
 Process Mining Visualizer  ──→  Process Assessment Tool  ──→  PDD Planner  ──→  Business Case Builder
-         │                                      │                 │
-         └──→ PDD Planner (direct)              └──→ Agentic      └──→ Business Case Builder
-         └──→ Agentic Planner (direct)               Planner
-         └──→ Assessment Tool
+         │                                      │                                        ^
+         └──→ PDD Planner (direct)              └──→ Agentic Planner  ───────────────────┘
+         └──→ Agentic Planner (direct)
 ```
 
 When the Assessment Tool receives Process Mining data, it acts as a transparent bridge — merging PMV fields into its outgoing payload so downstream tools receive the combined dataset.
