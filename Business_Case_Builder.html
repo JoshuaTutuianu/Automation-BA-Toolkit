@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Case Builder</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Epilogue:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap');
+
+        :root {
+            --bg: #F8F7F4;
+            --surface: #FFFFFF;
+            --surface2: #FAFAF8;
+            --border: #E2E0DB;
+            --accent: #1B3A5C;
+            --accent2: #C8893A;
+            --text: #1A1A1A;
+            --muted: #6B6B6B;
+            --muted2: #8B8A85;
+            --danger: #C0392B;
+            --warning: #B7770D;
+            --success: #1E6B45;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 16px;
+            min-height: 100vh;
+            padding: 40px 24px 80px;
+        }
+
+        .wrapper {
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 32px;
+            margin-bottom: 48px;
+        }
+
+        .label,
+        .project-field label,
+        .field label,
+        .check-label,
+        .hook-label,
+        .meta-label,
+        .api-key-label,
+        .stat-label,
+        .ai-subtitle,
+        .conf-label {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .label {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .label::before {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        h1 {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: clamp(32px, 5vw, 52px);
+            line-height: 1.1;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        /* DASHBOARD METRICS */
+        .roi-dashboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 600px) {
+            .roi-dashboard {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .roi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .roi-title {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .roi-value {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 24px;
+            color: var(--accent);
+        }
+
+        .roi-value.positive { color: var(--success); }
+        .roi-value.negative { color: var(--danger); }
+        .roi-value.neutral { color: var(--text); }
+
+
+        /* PROJECT NAME */
+        .project-field {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px 24px;
+            margin-bottom: 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .project-field label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .project-field input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 22px;
+            width: 100%;
+        }
+
+        .project-field input::placeholder {
+            color: var(--muted2);
+        }
+
+        /* PHASE */
+        .phase {
+            margin-bottom: 32px;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .phase-number {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #FFFFFF;
+            background: var(--accent);
+            width: 24px;
+            height: 24px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .phase.complete .phase-number {
+            background: var(--success);
+        }
+
+        .phase-title-group {
+            flex: 1;
+        }
+
+        .phase-title {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--accent);
+            border-left: 3px solid var(--accent2);
+            padding-left: 12px;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .phase-desc {
+            font-size: 14px;
+            color: var(--muted);
+            padding-left: 15px;
+        }
+
+        .phase-toggle {
+            font-size: 18px;
+            color: var(--muted);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .phase.open .phase-toggle {
+            color: var(--accent);
+        }
+
+        .phase-body {
+            display: none;
+            padding-left: 40px;
+        }
+
+        .phase.open .phase-body {
+            display: block;
+        }
+
+        /* FIELDS & INPUTS */
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        textarea,
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid #D0CEC9;
+            border-radius: 3px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.6;
+            outline: none;
+        }
+
+        textarea {
+            background: var(--surface2);
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        textarea:focus,
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(27, 58, 92, 0.15);
+        }
+
+        textarea::placeholder,
+        input::placeholder {
+            color: var(--muted2);
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        @media (min-width: 600px) {
+            .input-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* CHART */
+        .chart-container {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* DIVIDER */
+        .phase-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 32px;
+        }
+
+
+        /* ACTIONS */
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 14px 24px;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background: #142D47;
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            border: 1px solid #D0CEC9;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #F0EFEA;
+        }
+
+
+        /* META BAR */
+        .meta-bar {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .meta-label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .save-controls {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .save-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .save-row select {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid #D0CEC9;
+            border-radius: 3px;
+            color: var(--text);
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 16px;
+            padding: 10px 14px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 3px;
+            border: 1px solid #D0CEC9;
+            background: var(--surface);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--accent);
+            background: #F0EFEA;
+        }
+
+        /* AI REVIEWER */
+        .ai-section {
+            margin-top: 48px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--surface);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .ai-header {
+            border-bottom: 1px solid var(--border);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ai-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ai-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .ai-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--accent);
+            border-left: 3px solid var(--accent2);
+            padding-left: 12px;
+        }
+
+        .btn-ai-start {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-ai-start:hover {
+            background: #142D47;
+        }
+
+        .api-key-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .api-key-bar input {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid #D0CEC9;
+            border-radius: 3px;
+            padding: 10px 14px;
+            padding-right: 32px;
+        }
+
+        .btn-clear-key {
+            position: absolute;
+            right: 32px;
+            background: none;
+            border: none;
+            color: var(--muted2);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-clear-key:hover {
+            color: var(--danger);
+        }
+
+        .ai-messages {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 520px;
+            overflow-y: auto;
+        }
+
+        .msg {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .msg-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .msg-avatar.ai {
+            background: var(--accent);
+            color: #FFFFFF;
+        }
+
+        .msg-avatar.user {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .msg-content {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 14px 18px;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .msg.ai .msg-content {
+            background: var(--surface2);
+            border-left: 3px solid var(--accent2);
+        }
+
+        .ai-input-bar {
+            border-top: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            background: var(--surface);
+        }
+
+        .ai-input-bar textarea {
+            flex: 1;
+            min-height: 42px;
+        }
+
+        .btn-send {
+            background: var(--accent);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 3px;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .btn-send:hover {
+            background: #142D47;
+        }
+
+        .ai-body {
+            display: none;
+            flex-direction: column;
+        }
+
+        .ai-body.visible {
+            display: flex;
+        }
+
+        .ai-empty-state {
+            padding: 60px 40px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .empty-icon {
+            font-size: 42px;
+            color: var(--border);
+            margin-bottom: 20px;
+        }
+
+        .ai-body.has-started .ai-empty-state {
+            display: none;
+        }
+
+        .ai-messages,
+        .ai-mode-pills,
+        .ai-input-bar {
+            display: none;
+        }
+
+        .ai-body.has-started .ai-messages,
+        .ai-body.has-started .ai-mode-pills,
+        .ai-body.has-started .ai-input-bar {
+            display: flex;
+        }
+
+        .ai-mode-pills {
+            padding: 0 24px 16px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mode-pill {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-pill:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: #FFFFFF;
+        }
+
+        .api-key-hint {
+            font-size: 12px;
+            color: var(--muted2);
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 4px 0;
+        }
+
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: var(--muted2);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: typing 1.4s infinite both;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0.6);
+                opacity: 0.4;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* IMPORT BANNER & GATES */
+        .import-banner {
+            background: #FDF6E3;
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            border-radius: 4px;
+            padding: 14px 20px;
+            margin-bottom: 32px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .import-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .import-banner-dismiss {
+            background: transparent;
+            border: 1px solid var(--warning);
+            color: var(--warning);
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .import-banner-dismiss:hover {
+            background: rgba(183, 119, 13, 0.1);
+        }
+
+        .btn-icon-danger:hover {
+            border-color: var(--danger);
+            background: #FDECEA;
+            color: var(--danger);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #FFFFFF;
+            background: var(--accent);
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        /* SWITCH COMPONENT */
+        .switch-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 16px;
+            border-left: 1px solid var(--border);
+            padding-left: 16px;
+        }
+
+        .switch {
+            position: relative;
+            display: flex;
+            width: 36px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            margin: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #D0CEC9;
+            transition: .3s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #FFFFFF;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        input:checked+.slider {
+            background-color: var(--accent2);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(16px);
+        }
+
+        /* CONFIG BAR */
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 12px;
+            width: 100%;
+            align-items: flex-end;
+        }
+
+        .config-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .config-field label {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .config-field input {
+            font-size: 13px !important;
+            padding: 8px 12px !important;
+        }
+        
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: #FFFFFF;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .footer-credit {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <!-- Import Banner -->
+        <div class="import-banner" id="importBanner">
+            <div class="import-banner-left">
+                <span class="import-banner-icon">✦</span>
+                <span>Assessment & Scoping data imported.</span>
+            </div>
+            <button class="import-banner-dismiss"
+                onclick="document.getElementById('importBanner').style.display='none'">Dismiss</button>
+        </div>
+
+        <div class="header">
+            <div class="label">Business Case Builder</div>
+            <h1>Financial justification and executive sign-off for automation initiatives.</h1>
+            <p class="subtitle">Evaluate ROI, strategic benefits, and implementation risks before committing budget.</p>
+        </div>
+
+        <div class="project-field">
+            <label>Initiative Name</label>
+            <input type="text" placeholder="e.g. Finance AP Automation" id="projectName">
+        </div>
+        
+        <!-- SAVE BAR -->
+        <div class="meta-bar">
+            <div class="save-controls">
+                <span class="meta-label">Saved Business Cases</span>
+                <div class="save-row">
+                    <select id="savedList" onchange="loadSelected()">
+                        <option value="">— load a saved business case —</option>
+                    </select>
+                    <button class="btn-icon" title="Save current" onclick="saveBlueprint()">💾</button>
+                    <button class="btn-icon" title="Export JSON" onclick="exportJSON()">📤</button>
+                    <button class="btn-icon" title="Import JSON" onclick="document.getElementById('importFile').click()">📥</button>
+                    <button class="btn-icon btn-icon-danger" title="Delete selected" onclick="deleteSaved()">🗑</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="roi-dashboard">
+            <div class="roi-card">
+                <span class="roi-title">Total Implementation Cost</span>
+                <span class="roi-value neutral" id="dash_cost">€0</span>
+            </div>
+            <div class="roi-card">
+                <span class="roi-title">Annual Financial Benefit</span>
+                <span class="roi-value neutral" id="dash_benefit">€0</span>
+            </div>
+            <div class="roi-card">
+                <span class="roi-title">12-Month ROI</span>
+                <span class="roi-value neutral" id="dash_roi">0%</span>
+            </div>
+            <div class="roi-card">
+                <span class="roi-title">Payback Period</span>
+                <span class="roi-value neutral" id="dash_payback">0 Months</span>
+            </div>
+        </div>
+
+        <div id="phases">
+
+            <!-- PHASE 1 -->
+            <div class="phase open" data-phase="1">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-number">01</div>
+                    <div class="phase-title-group">
+                        <div class="phase-title">The Financial Model</div>
+                        <div class="phase-desc">Calculate implementation costs vs recurring savings.</div>
+                    </div>
+                    <div class="phase-toggle">-</div>
+                </div>
+                <div class="phase-body">
+                    <div class="input-grid">
+                        <div>
+                            <div class="label" style="margin-top: 10px;">Costs</div>
+                            <div class="field">
+                                <label>Estimated Dev Hours</label>
+                                <input type="number" id="inp_dev_hours" placeholder="e.g. 120" min="0" oninput="calculateROI()">
+                            </div>
+                            <div class="field">
+                                <label>Blended Dev Rate (€/hr)</label>
+                                <input type="number" id="inp_dev_rate" placeholder="e.g. 75" min="0" oninput="calculateROI()">
+                            </div>
+                            <div class="field">
+                                <label>Annual License/Infrastructure Cost (€)</label>
+                                <input type="number" id="inp_infra_cost" placeholder="e.g. 2000" min="0" oninput="calculateROI()">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="label" style="margin-top: 10px;">Savings</div>
+                            <div class="field">
+                                <label>Annual Hours Saved</label>
+                                <input type="number" id="inp_hours_saved" placeholder="e.g. 500" min="0" oninput="calculateROI()">
+                            </div>
+                            <div class="field">
+                                <label>Exception handling overhead (hrs/yr)</label>
+                                <input type="number" id="inp_exception_overhead" placeholder="e.g. 0" min="0" oninput="calculateROI()">
+                                <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Estimated human review time for exception cases. Deducted from gross hours saved.</p>
+                            </div>
+                            <div class="field">
+                                <label>Fully Loaded FTE Cost (€/yr)</label>
+                                <input type="number" id="inp_fte_cost" placeholder="e.g. 60000" min="0" oninput="calculateROI()">
+                            </div>
+                            <p style="font-size: 12px; color: var(--muted); margin-top: 10px;">
+                                * FTE savings are calculated assuming a standard 2,080 hour work year.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="roiChart"></canvas>
+                    </div>
+                </div>
+                <div class="phase-divider"></div>
+            </div>
+
+            <!-- PHASE 2 -->
+            <div class="phase" data-phase="2">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-number">02</div>
+                    <div class="phase-title-group">
+                        <div class="phase-title">Strategic Benefits</div>
+                        <div class="phase-desc">Qualitative outcomes that justify the investment.</div>
+                    </div>
+                    <div class="phase-toggle">+</div>
+                </div>
+                <div class="phase-body">
+                    <div class="field">
+                        <label>Productivity Gains</label>
+                        <textarea id="bcb_productivity_gains" placeholder="e.g. Allows team to focus on exception handling rather than data entry."></textarea>
+                    </div>
+                    <div class="field">
+                        <label>Quality & Compliance Enhancements</label>
+                        <textarea id="bcb_quality_compliance" placeholder="e.g. Eliminates copy-paste errors, creating a perfect audit trail."></textarea>
+                    </div>
+                    <div class="field">
+                        <label>Employee Experience Impact</label>
+                        <textarea id="bcb_employee_experience" placeholder="e.g. Reduces repetitive strain and boring tasks."></textarea>
+                    </div>
+                </div>
+                <div class="phase-divider"></div>
+            </div>
+
+            <!-- PHASE 3 -->
+            <div class="phase" data-phase="3">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-number">03</div>
+                    <div class="phase-title-group">
+                        <div class="phase-title">Risks & Mitigation</div>
+                        <div class="phase-desc">Identify implementation hurdles and how they will be handled.</div>
+                    </div>
+                    <div class="phase-toggle">+</div>
+                </div>
+                <div class="phase-body">
+                    <div class="field">
+                        <label>Primary Execution Risks</label>
+                        <textarea id="inp_risks" placeholder="What could delay or derail this automation?"></textarea>
+                    </div>
+                    <div class="field">
+                        <label>Mitigation Strategy</label>
+                        <textarea placeholder="How will we address the above risks?"></textarea>
+                    </div>
+                </div>
+                <div class="phase-divider"></div>
+            </div>
+
+            <!-- PHASE 4 -->
+            <div class="phase" data-phase="4">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-number">04</div>
+                    <div class="phase-title-group">
+                        <div class="phase-title">Recommendation & Sign-Off</div>
+                        <div class="phase-desc">The final verdict.</div>
+                    </div>
+                    <div class="phase-toggle">+</div>
+                </div>
+                <div class="phase-body">
+                    <div class="field">
+                        <label>Final Recommendation</label>
+                        <select>
+                            <option value="" disabled selected>Select an option...</option>
+                            <option value="Proceed">Proceed - Strong Business Case</option>
+                            <option value="Hold">Hold - Needs Clarification/Budget</option>
+                            <option value="Reject">Reject - Low ROI or High Risk</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Executive Summary Narrative</label>
+                        <textarea placeholder="A brief, compelling argument for the chosen recommendation."></textarea>
+                    </div>
+                </div>
+                <div class="phase-divider"></div>
+            </div>
+
+        </div>
+
+        <!-- AI REVIEWER -->
+        <div class="ai-section">
+            <div class="ai-header">
+                <div class="ai-header-left">
+                    <div class="ai-dot"></div>
+                    <div>
+                        <div class="ai-title">AI CFO / Financial Approver <span id="proxyBadge" class="status-badge">Proxy</span></div>
+                        <div class="ai-subtitle">Evaluates Financials · Challenges Assumptions · Scores Approval Likelihood</div>
+                    </div>
+                    <div class="switch-wrap">
+                        <label for="keyToggle" class="meta-label" style="margin-bottom:0; font-size:10px; cursor:pointer;">Custom Key</label>
+                        <label class="switch">
+                            <input type="checkbox" id="keyToggle" onchange="toggleManualKey()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <button class="btn-ai-start" id="startReviewBtn" onclick="startReview()">Submit to CFO →</button>
+            </div>
+            <div class="api-key-bar hidden" id="apiKeyBar">
+                <div class="config-grid">
+                    <div class="config-field">
+                        <label>Endpoint URL (OpenAI Compatible)</label>
+                        <input type="text" id="customEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
+                    </div>
+                    <div class="config-field">
+                        <label>Manual API Key</label>
+                        <input type="password" id="apiKeyInput" placeholder="sk-..." spellcheck="false" autocomplete="off">
+                    </div>
+                    <div class="config-field">
+                        <label>Model Name</label>
+                        <input type="text" id="customModel" placeholder="gpt-4o">
+                    </div>
+                    <div class="config-field">
+                        <button class="btn-icon btn-icon-danger" onclick="clearApiKey()" title="Reset to Proxy/Clear" style="height: 35px; width: 35px;">×</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-body" id="aiBody">
+                <div class="ai-empty-state" id="aiEmptyState">
+                    <div class="empty-icon">€</div>
+                    Click <strong style="color:var(--accent)">Submit to CFO</strong> to send your business case to the
+                    AI.<br>
+                    It will analyze the ROI, challenge underestimated costs or overly optimistic savings, and give an Approval Likelihood score.
+                </div>
+
+                <div class="ai-messages" id="aiMessages"></div>
+
+                <div class="ai-mode-pills" id="modePills">
+                    <button class="mode-pill"
+                        onclick="quickPrompt('Are there any hidden costs (like maintenance, licensing, or rework) that I am missing in my calculations?')">Challenge Costs</button>
+                    <button class="mode-pill"
+                        onclick="quickPrompt('Based on the strategic benefits, how would you pitch this to the CEO even if the direct ROI is low?')">Pitch to CEO</button>
+                    <button class="mode-pill"
+                        onclick="quickPrompt('What are the most likely reasons the finance committee would reject this proposal?')">Pre-Mortem Rejection</button>
+                </div>
+
+                <div class="ai-input-bar" id="aiInputBar">
+                    <textarea id="aiInput" placeholder="Defend your business case to the CFO..." rows="1"
+                        onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendMessage()}"
+                        oninput="this.style.height='42px';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                    <button class="btn-send" id="sendBtn" onclick="sendMessage()">↑</button>
+                </div>
+                <div id="proxy-fallback-msg" class="hidden"
+                    style="padding: 10px 24px; font-size: 12px; color: var(--danger); text-align: center; background: var(--surface2);">
+                    Demo key exhausted or failed. Please <a href="#"
+                        onclick="document.getElementById('apiKeyBar').classList.remove('hidden'); return false;"
+                        style="color: var(--accent); font-weight: 600;">provide your own API key</a> to continue.
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="exportBlueprint()">Export Markdown Case</button>
+            <button class="btn btn-secondary" onclick="clearAll()">Clear & Reset</button>
+        </div>
+
+    </div>
+
+    <div class="footer-credit">Built by Tutuianu Joshua · 2026</div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ── Data chain helpers ─────────────────────────────────────────
+        function decodeA(str) {
+            return JSON.parse(decodeURIComponent(atob(str)));
+        }
+
+        // ── Core UI ──────────────────────────────────────────────
+        function togglePhase(header) {
+            const phase = header.closest('.phase');
+            phase.classList.toggle('open');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        // ── ROI Logic & Chart.js ──────────────────────────────────
+        let roiChartInstance = null;
+
+        function formatCurrency(num) {
+            return '€' + num.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        }
+
+        function calculateROI() {
+            const devHours = parseFloat(document.getElementById('inp_dev_hours').value) || 0;
+            const devRate = parseFloat(document.getElementById('inp_dev_rate').value) || 0;
+            const infraCost = parseFloat(document.getElementById('inp_infra_cost').value) || 0;
+            
+            const grossHoursSaved = parseFloat(document.getElementById('inp_hours_saved').value) || 0;
+            const exceptionOverhead = parseFloat(document.getElementById('inp_exception_overhead').value) || 0;
+            const fteCost = parseFloat(document.getElementById('inp_fte_cost').value) || 0;
+
+            const hoursSaved = Math.max(0, grossHoursSaved - exceptionOverhead);
+
+            // Costs
+            const buildCost = devHours * devRate;
+            const totalInitialCost = buildCost + infraCost; // Year 1 cost
+            
+            // Savings
+            // Assuming 2080 working hours in a year for 1 FTE
+            const hourlyFteRate = fteCost / 2080;
+            const annualSavings = hoursSaved * hourlyFteRate;
+
+            // Metrics
+            let roi = 0;
+            let payback = 0;
+
+            if (totalInitialCost > 0) {
+                roi = ((annualSavings - totalInitialCost) / totalInitialCost) * 100;
+            }
+
+            if (annualSavings > 0) {
+                payback = (buildCost / (annualSavings - infraCost)) * 12; // Months to payback build cost considering net savings
+                if (payback < 0) payback = 0; // if infra > savings, it never pays back
+            }
+
+            // Update DOM
+            document.getElementById('dash_cost').textContent = formatCurrency(totalInitialCost);
+            document.getElementById('dash_benefit').textContent = formatCurrency(annualSavings);
+            
+            const roiEl = document.getElementById('dash_roi');
+            roiEl.textContent = roi.toFixed(0) + '%';
+            roiEl.className = 'roi-value ' + (roi > 0 ? 'positive' : (roi < 0 ? 'negative' : 'neutral'));
+
+            const paybackEl = document.getElementById('dash_payback');
+            if (annualSavings > infraCost) {
+                if (payback > 120) {
+                    paybackEl.textContent = '> 10 years';
+                    paybackEl.className = 'roi-value neutral';
+                } else {
+                    paybackEl.textContent = payback.toFixed(1) + ' Months';
+                    paybackEl.className = 'roi-value ' + (payback <= 12 ? 'positive' : 'neutral');
+                }
+            } else {
+                paybackEl.textContent = 'Never';
+                paybackEl.className = 'roi-value negative';
+            }
+
+            updateChart(buildCost, infraCost, annualSavings);
+        }
+
+        function updateChart(buildCost, infraCost, annualSavings) {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            
+            // Cumulative Cash Flow logic
+            // Year 0: Just the build cost (negative)
+            // Year 1: -Build Cost - Infra Cost + Savings
+            // Year 2: Year 1 - Infra Cost + Savings
+            // Year 3: Year 2 - Infra Cost + Savings
+
+            const year0 = -buildCost;
+            const year1 = year0 - infraCost + annualSavings;
+            const year2 = year1 - infraCost + annualSavings;
+            const year3 = year2 - infraCost + annualSavings;
+
+            const data = [year0, year1, year2, year3];
+            const labels = ['Launch', 'Year 1', 'Year 2', 'Year 3'];
+
+            const backgroundColors = data.map(v => v < 0 ? 'rgba(192, 57, 43, 0.5)' : 'rgba(30, 107, 69, 0.5)');
+            const borderColors = data.map(v => v < 0 ? '#C0392B' : '#1E6B45');
+
+            if (roiChartInstance) {
+                roiChartInstance.destroy();
+            }
+
+            roiChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cumulative Cash Flow (€)',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1,
+                        borderRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return formatCurrency(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'var(--border)' },
+                            ticks: { font: { family: "'IBM Plex Sans', sans-serif" } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: "'IBM Plex Sans', sans-serif" } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize empty chart
+        calculateROI();
+
+        // Markdown Export
+        function exportBlueprint() {
+            const project = document.getElementById('projectName').value || 'Untitled Initiative';
+            let out = `# Automation Business Case\n\n**Initiative Name:** ${project}\n**Date:** ${new Date().toLocaleDateString()}\n\n`;
+            
+            // Inject Dashboard
+            out += `## Financial Executive Summary\n`;
+            out += `- **Total Implementation Cost:** ${document.getElementById('dash_cost').textContent}\n`;
+            out += `- **Annual Financial Benefit:** ${document.getElementById('dash_benefit').textContent}\n`;
+            out += `- **12-Month ROI:** ${document.getElementById('dash_roi').textContent}\n`;
+            out += `- **Payback Period:** ${document.getElementById('dash_payback').textContent}\n\n`;
+
+            const phaseLabels = ['The Financial Model', 'Strategic Benefits', 'Risks & Mitigation', 'Recommendation & Sign-Off'];
+
+            document.querySelectorAll('.phase').forEach((phase, i) => {
+                out += `## ${phaseLabels[i]}\n\n`;
+                phase.querySelectorAll('textarea, input[type="number"], select').forEach(f => {
+                    const label = f.closest('.field')?.querySelector('label')?.textContent || '';
+                    let val = f.value.trim();
+                    if(f.tagName === 'SELECT' && f.selectedIndex > 0) val = f.options[f.selectedIndex].text;
+                    if (val && label) out += `### ${label}\n${val}\n\n`;
+                });
+            });
+
+            // Inject AI Assessment
+            const aiResponses = conversationHistory.filter(msg => msg.role === 'model');
+            if (aiResponses.length > 0) {
+                out += `## AI CFO Assessment\n\n`;
+                aiResponses.forEach(msg => {
+                    out += `${msg.content}\n\n---\n\n`;
+                });
+            }
+
+            const blob = new Blob([out], { type: 'text/markdown' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `Business_Case_${project.replace(/\s+/g, '_').toLowerCase()}.md`;
+            a.click();
+            showToast('Business Case exported ✓');
+        }
+
+        function clearAll() {
+            if (!confirm('Clear everything and start fresh?')) return;
+            document.querySelectorAll('textarea, input[type="text"], input[type="number"]').forEach(f => f.value = '');
+            document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+            
+            conversationHistory = [];
+            document.getElementById('aiMessages').innerHTML = '';
+            document.getElementById('aiBody').classList.remove('visible', 'has-started');
+            document.getElementById('startReviewBtn').textContent = 'Submit to CFO →';
+            
+            calculateROI();
+            showToast('Reset complete.');
+        }
+
+        // ── Blueprint Snapshot ───────────────────────────────────
+        function getBlueprintSnapshot() {
+            const project = document.getElementById('projectName').value.trim() || 'Untitled Initiative';
+            const phaseLabels = ['The Financial Model', 'Strategic Benefits', 'Risks & Mitigation', 'Recommendation & Sign-Off'];
+            let snapshot = `INITIATIVE: ${project}\n\n`;
+            
+            snapshot += `── DASHBOARD METRICS ──\n`;
+            snapshot += `Cost: ${document.getElementById('dash_cost').textContent} | Benefit: ${document.getElementById('dash_benefit').textContent} | ROI: ${document.getElementById('dash_roi').textContent} | Payback: ${document.getElementById('dash_payback').textContent}\n\n`;
+
+            document.querySelectorAll('.phase').forEach((phase, i) => {
+                let phaseContent = '';
+                phase.querySelectorAll('textarea, input[type="number"], select').forEach(f => {
+                    const label = f.closest('.field')?.querySelector('label')?.textContent?.trim() || '';
+                    let val = f.value.trim();
+                    if(f.tagName === 'SELECT' && f.selectedIndex > 0) val = f.options[f.selectedIndex].text;
+                    if (val && label) phaseContent += `  ${label}:\n  ${val}\n\n`;
+                });
+                
+                if (phaseContent) {
+                    snapshot += `── ${phaseLabels[i] || 'Phase ' + (i + 1)} ──\n`;
+                    snapshot += phaseContent;
+                }
+            });
+
+            return snapshot;
+        }
+
+        // ── AI Chat ────────────────────────────────────────────────
+        let conversationHistory = [];
+        let isThinking = false;
+
+        const PROXY_URL = 'https://nameless-sky-595c.joshuatutuianu128.workers.dev/';
+        
+        const SYSTEM_PROMPT = `You are a strict, analytical CFO (Chief Financial Officer) and Financial Approver. You are reviewing a business case for a new automation/AI initiative.
+
+Your job is to:
+1. Evaluate the Financial Model: Challenge the stated "Estimated Dev Hours" and "Infrastructure Costs" if they seem artificially low. Challenge the "Hours Saved" if they seem overly optimistic.
+2. Analyze the Dashboard Metrics: Interpret the ROI and Payback period. If payback takes longer than 12-18 months, question the validity of the investment.
+3. Assess Risks: Evaluate the "Mitigation Strategy" against the stated risks. If it's weak, push back.
+4. Final Verdict: At the end of your review, explicitly state a "Likelihood of Budget Approval" score (e.g. 8/10) and give a clear, firm recommendation (Approve, Request Revisions, or Reject).
+5. Format: Use Markdown for headers, bullet points, and emphasis. Be direct, uncompromising, and focused on business value.`;
+
+
+        function formatAIResponse(text) {
+            if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+                return DOMPurify.sanitize(marked.parse(text));
+            }
+            return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+        }
+
+        function addMessage(role, content, isLoading = false) {
+            const msgs = document.getElementById('aiMessages');
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+
+            let contentHtml = '';
+            if (isLoading) {
+                contentHtml = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+            } else if (role === 'ai') {
+                contentHtml = formatAIResponse(content);
+            } else {
+                const escapeEl = document.createElement('div');
+                escapeEl.textContent = content;
+                contentHtml = escapeEl.innerHTML.replace(/\n/g, '<br>');
+            }
+
+            div.innerHTML = `
+                <div class="msg-avatar ${role}">${role === 'ai' ? 'CFO' : 'You'}</div>
+                <div class="msg-content">${contentHtml}</div>`;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+            return div;
+        }
+
+        async function callAI(userMessage) {
+            const manualApiKey = document.getElementById('apiKeyInput').value.trim();
+            const customUrl = document.getElementById('customEndpoint').value.trim();
+            const customModel = document.getElementById('customModel').value.trim();
+            
+            const useProxy = !document.getElementById('keyToggle').checked;
+
+            if (useProxy && (!PROXY_URL || PROXY_URL.includes('your-worker-name'))) {
+                document.getElementById('apiKeyBar').classList.remove('hidden');
+                document.getElementById('keyToggle').checked = true;
+                showToast('Please configure the Proxy URL or provide an API Key.');
+                isThinking = false;
+                return;
+            }
+
+            conversationHistory.push({ role: 'user', content: userMessage });
+
+            const loadingMsg = addMessage('ai', '', true);
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('startReviewBtn').disabled = true;
+
+            try {
+                let endpoint, body;
+
+                if (useProxy) {
+                    // Proxy mode (Gemini format)
+                    endpoint = PROXY_URL;
+                    const geminiHistory = conversationHistory.map(msg => ({
+                        role: msg.role === 'ai' ? 'model' : msg.role,
+                        parts: [{ text: msg.content }]
+                    }));
+                    body = {
+                        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                        contents: geminiHistory,
+                        generationConfig: { temperature: 0.7, maxOutputTokens: 8000 }
+                    };
+                } else {
+                    // Manual mode (OpenAI-compatible format)
+                    endpoint = customUrl || 'https://api.openai.com/v1/chat/completions';
+                    const messages = [
+                        { role: 'system', content: SYSTEM_PROMPT },
+                        ...conversationHistory.map(msg => ({
+                            role: msg.role === 'ai' ? 'assistant' : msg.role,
+                            content: msg.content
+                        }))
+                    ];
+                    body = {
+                        model: customModel || 'gpt-4o',
+                        messages: messages,
+                        temperature: 0.7
+                    };
+                }
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(useProxy ? {} : { 'Authorization': `Bearer ${manualApiKey}` })
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    loadingMsg.querySelector('.msg-content').innerHTML = `<em>Error: ${data.error.message || JSON.stringify(data.error)}</em>`;
+                    if (useProxy) document.getElementById('proxy-fallback-msg').classList.remove('hidden');
+                    if (conversationHistory.length > 0) conversationHistory.pop();
+                } else {
+                    let reply = '';
+                    if (useProxy) {
+                        reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+                    } else {
+                        reply = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+                    }
+                    
+                    loadingMsg.querySelector('.msg-content').innerHTML = formatAIResponse(reply);
+                    conversationHistory.push({ role: 'ai', content: reply });
+                    document.getElementById('proxy-fallback-msg').classList.add('hidden');
+                }
+
+            } catch (err) {
+                console.error(err);
+                loadingMsg.querySelector('.msg-content').innerHTML = '<em>Connection failed. Check your console or network settings.</em>';
+                if (useProxy) document.getElementById('proxy-fallback-msg').classList.remove('hidden');
+                if (conversationHistory.length > 0) conversationHistory.pop();
+            }
+
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('startReviewBtn').disabled = false;
+            document.getElementById('aiMessages').scrollTop = document.getElementById('aiMessages').scrollHeight;
+            isThinking = false;
+        }
+
+        function toggleManualKey() {
+            const bar = document.getElementById('apiKeyBar');
+            const isChecked = document.getElementById('keyToggle').checked;
+            bar.classList.toggle('hidden', !isChecked);
+            updateProxyStatus();
+        }
+
+        function clearApiKey() {
+            if(!confirm('Reset custom configuration to defaults?')) return;
+            document.getElementById('apiKeyInput').value = '';
+            document.getElementById('customEndpoint').value = '';
+            document.getElementById('customModel').value = '';
+            localStorage.removeItem('gemini_api_key');
+            localStorage.removeItem('custom_endpoint');
+            localStorage.removeItem('custom_model');
+            updateProxyStatus();
+            showToast('Configuration cleared.');
+        }
+
+        async function startReview() {
+            const snapshot = getBlueprintSnapshot();
+            const hasContent = snapshot.replace(/INITIATIVE:.*\n/, '').trim().length > 50;
+
+            if (!hasContent) {
+                showToast('Fill in the Financial Model fields first!');
+                return;
+            }
+
+            document.getElementById('aiBody').classList.add('visible', 'has-started');
+            document.getElementById('startReviewBtn').textContent = 'Re-Submit ↺';
+
+            conversationHistory = [];
+
+            const firstMessage = `Here is my current Automation Business Case. Please review it as the CFO. Challenge my assumptions and provide an Approval Likelihood score.\n\n${snapshot}`;
+
+            addMessage('user', 'Submitting business case to CFO for review...');
+            await callAI(firstMessage);
+        }
+
+        async function sendMessage() {
+            if (isThinking) return;
+            const input = document.getElementById('aiInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            isThinking = true;
+            input.value = '';
+            input.style.height = '42px';
+            addMessage('user', msg);
+            await callAI(msg);
+        }
+
+        function quickPrompt(text) {
+            if (isThinking) return;
+            document.getElementById('aiInput').value = text;
+            sendMessage();
+        }
+
+        // ── Save / Load ──────────────────────────────────────────
+        const STORAGE_KEY = 'business_cases_v1';
+
+        function getAllSaved() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+            catch { return {}; }
+        }
+
+        function refreshSavedList() {
+            const saved = getAllSaved();
+            const select = document.getElementById('savedList');
+            const current = select.value;
+            select.innerHTML = '<option value="">— load a saved business case —</option>';
+            Object.keys(saved).sort((a, b) => saved[b].ts - saved[a].ts).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                const d = new Date(saved[key].ts);
+                opt.textContent = `${key}  (${d.toLocaleDateString()})`;
+                select.appendChild(opt);
+            });
+            if (current && saved[current]) select.value = current;
+        }
+
+        function captureState() {
+            const state = {
+                projectName: document.getElementById('projectName').value,
+                fields: [],
+                selects: [],
+                ts: Date.now()
+            };
+            document.querySelectorAll('.phase textarea, .phase input[type="text"], .phase input[type="number"]').forEach((f, i) => {
+                state.fields.push(f.value);
+            });
+            document.querySelectorAll('.phase select').forEach((s, i) => {
+                state.selects.push(s.value);
+            });
+            return state;
+        }
+
+        function applyState(state) {
+            document.getElementById('projectName').value = state.projectName || '';
+
+            const fields = document.querySelectorAll('.phase textarea, .phase input[type="text"], .phase input[type="number"]');
+            (state.fields || []).forEach((v, i) => { if (fields[i]) fields[i].value = v; });
+
+            const selects = document.querySelectorAll('.phase select');
+            (state.selects || []).forEach((v, i) => { if (selects[i]) selects[i].value = v; });
+
+            calculateROI();
+        }
+
+        function saveBlueprint() {
+            const name = document.getElementById('projectName').value.trim();
+            if (!name) { showToast('Add an Initiative Name first.'); return; }
+            const saved = getAllSaved();
+            if (saved[name] && !confirm(`Overwrite "${name}"?`)) return;
+            saved[name] = captureState();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+            refreshSavedList();
+            document.getElementById('savedList').value = name;
+            showToast(`Saved: ${name} ✓`);
+        }
+
+        function exportJSON() {
+            const name = document.getElementById('projectName').value.trim() || 'Business_Case_Export';
+            const state = captureState();
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${name.replace(/\s+/g, '_').toLowerCase()}_business_case.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('JSON Exported ✓');
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const state = JSON.parse(e.target.result);
+                    applyState(state);
+                    showToast('JSON Imported ✓');
+                } catch (err) {
+                    alert('Invalid JSON file.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // clear for next time
+        }
+
+        function loadSelected() {
+            const key = document.getElementById('savedList').value;
+            if (!key) return;
+            const saved = getAllSaved();
+            if (!saved[key]) return;
+            applyState(saved[key]);
+            showToast(`Loaded: ${key}`);
+        }
+
+        function deleteSaved() {
+            const key = document.getElementById('savedList').value;
+            if (!key) { showToast('Select a business case to delete.'); return; }
+            if (!confirm(`Delete "${key}"?`)) return;
+            const saved = getAllSaved();
+            delete saved[key];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+            refreshSavedList();
+            showToast(`Deleted: ${key}`);
+        }
+
+        // ── Init ─────────────────────────────────────────────────
+        refreshSavedList();
+
+        const savedKey = localStorage.getItem('gemini_api_key');
+        const savedUrl = localStorage.getItem('custom_endpoint');
+        const savedModel = localStorage.getItem('custom_model');
+
+        if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
+        if (savedUrl) document.getElementById('customEndpoint').value = savedUrl;
+        if (savedModel) document.getElementById('customModel').value = savedModel;
+
+        function updateProxyStatus() {
+            const isManual = document.getElementById('keyToggle').checked;
+            const badge = document.getElementById('proxyBadge');
+            if (badge) {
+                badge.textContent = isManual ? 'Custom API' : 'Proxy Active';
+                badge.style.background = isManual ? 'var(--warning)' : 'var(--accent)';
+            }
+        }
+
+        ['apiKeyInput', 'customEndpoint', 'customModel'].forEach(id => {
+            document.getElementById(id).addEventListener('input', e => {
+                const key = id === 'apiKeyInput' ? 'gemini_api_key' : id === 'customEndpoint' ? 'custom_endpoint' : 'custom_model';
+                localStorage.setItem(key, e.target.value.trim());
+                updateProxyStatus();
+            });
+        });
+
+        updateProxyStatus();
+
+        // ── URL Parameter Import ──────────────────────────────────
+        (function importFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (!params.has('_a')) return;
+
+            let a;
+            try { a = decodeA(params.get('_a')); }
+            catch(e) { console.warn('BCB: _a decode failed', e); return; }
+
+            // ── Fields present on all paths ──
+            if (a.process) document.getElementById('projectName').value = a.process;
+
+            if (a.bandwidth && a.bandwidth !== '') {
+                document.getElementById('inp_hours_saved').value = a.bandwidth;
+            }
+
+            // Build risks text (Assessment base, extended by PDD/Agentic keys)
+            let risks = '';
+            if (a.exceptions)  risks += `Exception rate assessed at ${a.exceptions}%, requiring robust human-in-the-loop fallback.\n`;
+            if (a.thin_client && a.thin_client !== 'no') risks += `Requires Thin Client / VDI interaction (latency/UI failure risk).\n`;
+            if (a.ocr && a.ocr !== 'no') risks += `Requires OCR (data quality and extraction risk).\n`;
+            if (a.context)     risks += `\nAssessment Notes:\n${a.context}`;
+
+            // ── PDD path ──
+            if (a.pdd_driver)    document.getElementById('bcb_productivity_gains').value  = `From PDD Analysis:\n${a.pdd_driver}`;
+            if (a.pdd_secondary) document.getElementById('bcb_employee_experience').value = `From PDD Analysis:\n${a.pdd_secondary}`;
+            if (a.pdd_tech)      risks += `\n\nPDD Technical Constraints:\n${a.pdd_tech}`;
+            if (a.pdd_biz_exc)   risks += `\n\nPDD Business Exceptions:\n${a.pdd_biz_exc}`;
+
+            // ── Agentic path ──
+            if (a.agent_kpis)  document.getElementById('bcb_quality_compliance').value = `From Agent Blueprint KPIs:\n${a.agent_kpis}`;
+            if (a.agent_blast) risks += `\n\nAgent Blast Radius:\n${a.agent_blast}`;
+
+            // Write combined risks
+            if (risks.trim()) document.getElementById('inp_risks').value = risks.trim();
+
+            // ── Import banner ──
+            const bannerTextEl = document.querySelector('#importBanner .import-banner-left span:last-child');
+            if (bannerTextEl) {
+                if (a._src === 'pdd')        bannerTextEl.textContent = 'Assessment + PDD Planner data imported.';
+                else if (a._src === 'agent') bannerTextEl.textContent = 'Assessment + Agentic Planner data imported.';
+                else                         bannerTextEl.textContent = 'Assessment & Scoping data imported.';
+            }
+
+            document.getElementById('importBanner').style.display = 'flex';
+            if (a.bandwidth) calculateROI();
+        })();
+    </script>
+</body>
+
+</html>

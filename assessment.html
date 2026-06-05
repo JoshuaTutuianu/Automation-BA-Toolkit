@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Process Assessment Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <style>
+        :root {
+            --bg:           #F8F7F4;
+            --surface:      #FFFFFF;
+            --border:       #E2E0DB;
+            --border-input: #D0CEC9;
+            --navy:         #1B3A5C;
+            --navy-dark:    #142D47;
+            --amber:        #C8893A;
+            --text:         #1A1A1A;
+            --text-muted:   #6B6B6B;
+            --danger:       #C0392B;
+            --danger-bg:    #FDECEA;
+            --danger-border:#E8A09A;
+            --warning:      #B7770D;
+            --warning-bg:   #FDF6E3;
+            --warning-border:#E0C070;
+            --success:      #1E6B45;
+            --textarea-bg:  #FAFAF8;
+            --font:         'IBM Plex Sans', sans-serif;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font);
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 4rem;
+        }
+
+        /* ── Header ── */
+        header {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .header-eyebrow {
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--amber);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        /* ── Cards / Sections ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section {
+            margin-bottom: 1.25rem;
+            padding: 1.75rem 2rem;
+            transition: opacity 0.2s ease;
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-left: 0.875rem;
+            border-left: 3px solid var(--amber);
+        }
+
+        .section-header h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--navy);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .section-header .section-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* ── Questions ── */
+        .question-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .question-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label.question-label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        label.question-label .tag {
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-left: 0.35rem;
+        }
+
+        /* ── Inputs ── */
+        select,
+        input[type="number"],
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.6rem 0.875rem;
+            background: var(--surface);
+            border: 1px solid var(--border-input);
+            border-radius: 3px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.9rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.875rem center;
+            padding-right: 2.5rem;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 3px rgba(27, 58, 92, 0.12);
+        }
+
+        select option {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.6rem 0.875rem;
+            background: var(--textarea-bg);
+            border: 1px solid var(--border-input);
+            border-radius: 3px;
+            color: var(--text-muted);
+            font-family: var(--font);
+            font-size: 0.82rem;
+            resize: vertical;
+            min-height: 56px;
+            margin-top: 0.4rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 3px rgba(27, 58, 92, 0.12);
+            color: var(--text);
+        }
+
+        textarea::placeholder {
+            color: #B0ADA8;
+            font-style: italic;
+        }
+
+        /* ── Gate Alerts ── */
+        .gate-alert {
+            display: none;
+            padding: 1.25rem 1.5rem;
+            border-radius: 4px;
+            margin-bottom: 1.25rem;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .gate-alert.danger {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            border-left: 4px solid var(--danger);
+            color: var(--danger);
+            display: none;
+        }
+
+        .gate-alert.warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            border-left: 4px solid var(--warning);
+            color: var(--warning);
+            display: none;
+        }
+
+        .gate-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gate-alert p {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* ── Process Name Field ── */
+        .process-name-field {
+            margin-bottom: 1.25rem;
+            padding: 1.5rem 2rem;
+        }
+
+        .process-name-field label.question-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--navy);
+            font-weight: 600;
+        }
+
+        .process-name-field input[type="text"] {
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-color: var(--border-input);
+            color: var(--navy);
+            padding: 0.75rem 0.875rem;
+        }
+
+        .process-name-field input[type="text"]:focus {
+            border-color: var(--navy);
+        }
+
+        /* ── Dimming when gate triggered ── */
+        .form-halted .section:not(.active-gate) {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .active-gate {
+            border-color: var(--danger) !important;
+        }
+
+        /* ── Dashboard ── */
+        .dashboard {
+            margin-top: 1.5rem;
+            margin-bottom: 1.25rem;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric {
+            padding: 1.5rem;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .metric:last-of-type {
+            border-right: none;
+        }
+
+        .metric-title {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--amber);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .metric-value.placeholder {
+            color: var(--border-input);
+            font-size: 1.5rem;
+        }
+
+        .metric-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* ── PDD Button wrap ── */
+        .dashboard-pdd-wrap {
+            display: none;
+            grid-column: 1 / -1;
+            padding: 1rem 1.5rem;
+            background: #F5F3EF;
+            border-top: 1px solid var(--border);
+        }
+
+        .dashboard-pdd-wrap.visible {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            padding: 0.65rem 1.375rem;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: background 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.01em;
+        }
+
+        .btn:hover {
+            background: var(--navy-dark);
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-pdd {
+            background: var(--amber);
+            color: #fff;
+            border: none;
+            padding: 0.65rem 1.375rem;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: background 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-pdd:hover {
+            background: #B57830;
+        }
+
+        .btn-agent {
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            padding: 0.65rem 1.375rem;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: background 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-agent:hover {
+            background: var(--navy-dark);
+        }
+
+        /* ── AI Section ── */
+        .ai-section {
+            margin-top: 0;
+            padding: 1.75rem 2rem;
+        }
+
+        .ai-section h2 {
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--navy);
+            font-weight: 600;
+            padding-left: 0.875rem;
+            border-left: 3px solid var(--amber);
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-section .ai-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+            margin-left: 0;
+        }
+
+        .api-key-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .api-key-row input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        #ai-response {
+            margin-top: 1.25rem;
+            text-align: left;
+            padding: 1.25rem 1.5rem;
+            background: var(--textarea-bg);
+            border-radius: 3px;
+            display: none;
+            white-space: pre-wrap;
+            font-size: 0.875rem;
+            border: 1px solid var(--border);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* ── Divider ── */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 0.5rem 0 1.25rem;
+        }
+
+        /* ── Toggle Switch & Config Bar ── */
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #FFFFFF;
+            background: var(--navy);
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .switch-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 16px;
+            border-left: 1px solid var(--border);
+            padding-left: 16px;
+            vertical-align: middle;
+        }
+
+        .switch {
+            position: relative;
+            display: flex;
+            width: 36px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            margin: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #D0CEC9;
+            transition: .3s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #FFFFFF;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        input:checked+.slider {
+            background-color: var(--amber);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(16px);
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 12px;
+            width: 100%;
+            align-items: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .config-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .config-field label {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .config-field input {
+            font-size: 13px !important;
+            padding: 8px 12px !important;
+        }
+
+        .btn-icon-danger {
+            background: var(--surface);
+            border: 1px solid var(--border-input);
+            color: var(--text-muted);
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-danger:hover {
+            border-color: var(--danger);
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--navy);
+            color: #FFFFFF;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* ── Save Controls Bar ── */
+        .save-bar {
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .save-controls {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .save-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .save-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .save-row select {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border-input);
+            border-radius: 3px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            padding: 0.6rem 0.875rem;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.875rem center;
+            padding-right: 2.5rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .save-row select:focus {
+            border-color: var(--navy);
+            box-shadow: 0 0 0 3px rgba(27, 58, 92, 0.12);
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 3px;
+            border: 1px solid var(--border-input);
+            background: var(--surface);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--navy);
+            background: #F0EFEA;
+        }
+
+        .btn-icon.danger:hover {
+            border-color: var(--danger);
+            background: var(--danger-bg);
+        }
+
+        .utility-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 0;
+        }
+
+        .btn-roi {
+            background: var(--success);
+            color: #fff;
+            border: none;
+            padding: 0.65rem 1.375rem;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: background 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-roi:hover {
+            background: #165a39;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="header-eyebrow">RPA Discovery Framework</div>
+        <h1>Process Assessment Tool</h1>
+        <p class="subtitle">Guided Process Discovery &amp; Automation Suitability Analysis</p>
+    </header>
+
+    <!-- SAVE / LOAD BAR -->
+    <div class="save-bar">
+        <div class="save-controls">
+            <span class="save-label">Saved Assessments</span>
+            <div class="save-row">
+                <select id="savedList" onchange="loadSelected()">
+                    <option value="">— load a saved assessment —</option>
+                </select>
+                <button class="btn-icon" title="Save current assessment" onclick="saveAssessment()">💾</button>
+                <button class="btn-icon" title="Export JSON" onclick="exportJSON()">📤</button>
+                <button class="btn-icon" title="Import JSON" onclick="document.getElementById('importFile').click()">📥</button>
+                <button class="btn-icon danger" title="Delete selected" onclick="deleteSelected()">🗑</button>
+                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Gate Alerts -->
+    <div id="eliminatory-alert" class="gate-alert danger">
+        <div class="gate-title">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+            Eliminatory Gate Triggered — Low Feasibility
+        </div>
+        <p id="eliminatory-reason">The process does not meet the minimum feasibility criteria.</p>
+    </div>
+
+    <div id="postponement-alert" class="gate-alert warning">
+        <div class="gate-title">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Postponement Gate Triggered — Reassess Later
+        </div>
+        <p id="postponement-reason">The process is unstable. Postpone assessment.</p>
+    </div>
+
+    <!-- PMV Import Banner -->
+    <div id="pmv-import-banner" class="gate-alert warning" style="display:none;border-left:4px solid var(--accent);background:#F0EFEA;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span id="pmv-import-banner-text">✦ Process Mining data imported — review pre-filled fields and complete remaining questions.</span>
+            <button onclick="document.getElementById('pmv-import-banner').style.display='none'" style="background:none; border:1px solid var(--warning); color:var(--warning); padding:4px 10px; border-radius:3px; cursor:pointer; font-size:12px; font-family:var(--font);">Dismiss</button>
+        </div>
+    </div>
+
+    <form id="assessment-form">
+
+        <!-- PROCESS NAME -->
+        <div class="card section process-name-field" id="section-process-name">
+            <label class="question-label" for="q_process_name">Process Name</label>
+            <input type="text" id="q_process_name" name="Process Name" placeholder="e.g. AP Invoice Processing, HR Onboarding..." autocomplete="off">
+        </div>
+
+        <!-- INPUT TYPES -->
+        <div class="card section" id="section-input-types">
+            <div class="section-header">
+                <h2>Input Types</h2>
+                <div class="section-desc">Eliminatory — failure halts the assessment</div>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">How do the majority of your data inputs look like?</label>
+                <select id="q_input_types" name="Input Types">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="Digital and Structured">Digital and Structured</option>
+                    <option value="Digital and Unstructured">Digital and Unstructured</option>
+                    <option value="Non Digital and Structured">Non Digital and Structured</option>
+                    <option value="Not digital and Unstructured">Not digital and Unstructured</option>
+                </select>
+                <textarea name="Note_Input_Types" placeholder="Notes & contextual observations..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">Rule Based vs Ad-hoc / Judgemental</label>
+                <select id="q_rule_based" name="Rule Based">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="Exclusively Rule Based">Exclusively Rule Based</option>
+                    <option value="Mostly Rule Based">Mostly Rule Based</option>
+                    <option value="Some level of subjectivity involved">Some level of subjectivity involved</option>
+                    <option value="Mostly subjective">Mostly subjective</option>
+                    <option value="Exclusively Subjective">Exclusively Subjective</option>
+                </select>
+                <textarea name="Note_Rule_Based" placeholder="Notes & contextual observations..."></textarea>
+            </div>
+        </div>
+
+        <!-- PROCESS STABILITY -->
+        <div class="card section" id="section-process-stability">
+            <div class="section-header">
+                <h2>Process Stability</h2>
+                <div class="section-desc">Postponement — significant change defers the assessment</div>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">How will your process change in the next 6 months?</label>
+                <select id="q_process_stability" name="Process Stability">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="0">No change expected</option>
+                    <option value="0.2">Very Small Change</option>
+                    <option value="0.4">Some change</option>
+                    <option value="0.8">Medium Change</option>
+                    <option value="postpone">Significant Change</option>
+                </select>
+                <textarea name="Note_Process_Stability" placeholder="Notes & contextual observations..."></textarea>
+            </div>
+        </div>
+
+        <!-- APPLICATIONS STABILITY -->
+        <div class="card section" id="section-apps-stability">
+            <div class="section-header">
+                <h2>Applications Stability</h2>
+                <div class="section-desc">Postponement — significant change defers the assessment</div>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">How will your applications change in the next 6 months?</label>
+                <select id="q_apps_stability" name="Applications Stability">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="0">No change expected</option>
+                    <option value="0.2">Very Small Change</option>
+                    <option value="0.4">Some change</option>
+                    <option value="0.8">Medium Change</option>
+                    <option value="postpone">Significant Change</option>
+                </select>
+                <textarea name="Note_Apps_Stability" placeholder="Notes & contextual observations..."></textarea>
+            </div>
+        </div>
+
+        <!-- BENEFITS -->
+        <div class="card section" id="section-benefits">
+            <div class="section-header">
+                <h2>Benefits</h2>
+                <div class="section-desc">Volume and frequency data used to calculate bandwidth freed</div>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">How many employees are currently needed to perform the process?</label>
+                <input type="number" id="q_employees" name="Employees" min="0" step="0.1" placeholder="e.g. 2">
+                <textarea name="Note_Employees" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">What is the frequency of the process?</label>
+                <select id="q_frequency" name="Frequency">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="260">Daily</option>
+                    <option value="52">Weekly</option>
+                    <option value="26">Bi-weekly</option>
+                    <option value="12">Monthly</option>
+                    <option value="4">Quarterly</option>
+                    <option value="1">Annually</option>
+                </select>
+                <textarea name="Note_Frequency" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">What is the volume of transactions per frequency?</label>
+                <input type="number" id="q_volume" name="Volume" min="0" placeholder="e.g. 150">
+                <textarea name="Note_Volume" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">What is the average time it takes for the process to be ran once (minutes)?</label>
+                <input type="number" id="q_aht" name="AHT" min="0" placeholder="e.g. 10">
+                <textarea name="Note_AHT" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">What is the average number of human errors per frequency? <span class="tag">(Informational)</span></label>
+                <input type="number" id="q_errors" name="Errors" min="0" placeholder="e.g. 3">
+                <textarea name="Note_Errors" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">How would you characterize the peaks of the process? <span class="tag">(Informational)</span></label>
+                <select id="q_peaks" name="Peaks">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="1">Regular, increasing capacity by &gt;20%</option>
+                    <option value="2">Rare but predictable event</option>
+                    <option value="3">Rare event, hard to predict</option>
+                    <option value="0">The process does not have peaks</option>
+                </select>
+                <textarea name="Note_Peaks" placeholder="Notes..."></textarea>
+            </div>
+        </div>
+
+        <!-- PROCESS COMPLEXITY -->
+        <div class="card section" id="section-complexity">
+            <div class="section-header">
+                <h2>Process Complexity</h2>
+                <div class="section-desc">Contributes to Implementation Effort score</div>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">How many steps does the process have?</label>
+                <select id="q_steps" name="Steps">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="0.1">&lt;= 10 steps</option>
+                    <option value="0.2">10–15 steps</option>
+                    <option value="0.4">15–25 steps</option>
+                    <option value="0.6">25–40 steps</option>
+                    <option value="1">&gt; 40 steps</option>
+                </select>
+                <textarea name="Note_Steps" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">How difficult are the decisions required to complete the process?</label>
+                <select id="q_decisions" name="Decisions">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="0.1">The process is linear — no decisions</option>
+                    <option value="0.2">The process involves simple decisions (yes/no type)</option>
+                    <option value="0.7">The process involves complex decisions</option>
+                </select>
+                <textarea name="Note_Decisions" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">What is the % of cases where you are unable to complete the entire process (Exceptions)?</label>
+                <input type="number" id="q_exceptions" name="Exceptions" min="0" max="100" placeholder="e.g. 5">
+                <textarea name="Note_Exceptions" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">What is the number of applications used for the process?</label>
+                <select id="q_apps_count" name="Apps Count">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="0.1">1 application</option>
+                    <option value="0.3">2–3 applications</option>
+                    <option value="0.6">4–5 applications</option>
+                    <option value="1">&gt; 5 applications</option>
+                </select>
+                <textarea name="Note_Apps_Count" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">Are any of the applications accessed via virtual machines (Thin Client / VDI)?</label>
+                <select id="q_thin_client" name="Thin Client">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="1.6">Yes</option>
+                    <option value="1">No</option>
+                </select>
+                <textarea name="Note_Thin_Client" placeholder="Notes..."></textarea>
+            </div>
+        </div>
+
+        <!-- INPUT DATA -->
+        <div class="card section" id="section-input-data">
+            <div class="section-header">
+                <h2>Input Data</h2>
+                <div class="section-desc">Data quality and structure impact Benefit score</div>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">What % of your input data is digital?</label>
+                <input type="number" id="q_digital_pct" name="Digital Pct" min="0" max="100" placeholder="e.g. 100">
+                <textarea name="Note_Digital_Pct" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">Is any of your digital input scanned (OCR required)?</label>
+                <select id="q_ocr" name="OCR">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="1.2">Yes</option>
+                    <option value="1">No</option>
+                </select>
+                <textarea name="Note_OCR" placeholder="Notes..."></textarea>
+            </div>
+
+            <div class="question-group">
+                <label class="question-label">What % of your input data is structured?</label>
+                <select id="q_structured" name="Structured Data">
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="0">&gt;= 80%</option>
+                    <option value="0.4">60%–80%</option>
+                    <option value="0.7">40%–60%</option>
+                    <option value="1">&lt; 40%</option>
+                </select>
+                <textarea name="Note_Structured" placeholder="Notes..."></textarea>
+            </div>
+        </div>
+
+    </form>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard" id="results-dashboard">
+        <div class="metric">
+            <div class="metric-title">Ease of Implementation</div>
+            <div class="metric-value" id="res_ease">—</div>
+            <div class="metric-desc" id="res_ease_desc">awaiting input</div>
+        </div>
+        <div class="metric">
+            <div class="metric-title">Benefit / Suitability</div>
+            <div class="metric-value" id="res_benefit">—</div>
+            <div class="metric-desc" id="res_benefit_desc">awaiting input</div>
+        </div>
+        <div class="metric">
+            <div class="metric-title">Bandwidth Freed</div>
+            <div class="metric-value" id="res_bandwidth">—</div>
+            <div class="metric-desc">man hours / year</div>
+        </div>
+        <div class="dashboard-pdd-wrap" id="pdd-btn-wrap">
+            <button type="button" class="btn-pdd" id="btn_send_pdd" onclick="sendToRPA()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                Send to RPA PDD Planner
+            </button>
+            <button type="button" class="btn-agent" id="btn_send_agent" onclick="sendToAgent()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                Send to Agentic Planner
+            </button>
+            <button type="button" class="btn-roi" id="btn_send_roi" onclick="sendToROI()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                Build Business Case
+            </button>
+        </div>
+    </div>
+
+    <!-- AI REVIEW -->
+    <div class="card section ai-section">
+        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+            <h2 style="margin-bottom: 0; padding-left: 0.875rem; border-left: 3px solid var(--amber);">AI Reviewer <span id="proxyBadge" class="status-badge">Proxy</span></h2>
+            <div class="switch-wrap">
+                <label for="keyToggle" style="font-size:10px; font-weight:600; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; cursor:pointer;">Custom Key</label>
+                <label class="switch">
+                    <input type="checkbox" id="keyToggle" onchange="toggleManualKey()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        <p class="ai-desc" style="padding-left: 0.875rem;">Submit all scores and notes to the AI for a narrative interpretation and final recommendation based on both hard scores and contextual notes.</p>
+        
+        <div class="api-key-bar hidden" id="apiKeyBar">
+            <div class="config-grid">
+                <div class="config-field">
+                    <label>Endpoint URL (OpenAI Compatible)</label>
+                    <input type="text" id="customEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
+                </div>
+                <div class="config-field">
+                    <label>Manual API Key</label>
+                    <input type="password" id="api_key" placeholder="sk-..." autocomplete="new-password" spellcheck="false">
+                </div>
+                <div class="config-field">
+                    <label>Model Name</label>
+                    <input type="text" id="customModel" placeholder="gpt-4o">
+                </div>
+                <div class="config-field">
+                    <button class="btn-icon-danger" onclick="clearApiKey()" title="Reset to Proxy/Clear" style="height: 35px; width: 35px; padding:0;">×</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" id="btn_analyze">
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Generate Recommendation
+        </button>
+        <div id="proxy-fallback-msg" class="hidden" style="margin-top: 10px; padding: 10px 15px; font-size: 12px; color: var(--danger); background: var(--danger-bg); border: 1px solid var(--danger-border); border-radius: 3px;">
+            Connection failed. Please <a href="#" onclick="document.getElementById('keyToggle').click(); return false;" style="color: var(--danger); font-weight: 600; text-decoration: underline;">provide your own Custom API Key</a> to continue.
+        </div>
+        <div id="ai-response"></div>
+    </div>
+
+    <!-- CLEAR BUTTON -->
+    <div style="margin-top: 2rem; text-align: right;">
+        <button type="button" class="btn" onclick="clearAll()" style="background: var(--surface); border: 1px solid var(--border-input); color: var(--text-muted); font-size: 0.8rem;">
+            Clear & Reset
+        </button>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="text-align: center; margin-top: 3rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">
+        Built by Tutuianu Joshua
+    </div>
+
+</div>
+
+<script>
+    // ── Data chain helpers ─────────────────────────────────────────
+    function encodeA(obj) {
+        return btoa(encodeURIComponent(JSON.stringify(obj)));
+    }
+    function decodeA(str) {
+        return JSON.parse(decodeURIComponent(atob(str)));
+    }
+
+    let _cached_pmv = null;   // decoded PMV payload, set by importFromURL
+
+    (function importFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has('_a')) return;
+
+        let a;
+        try { a = decodeA(params.get('_a')); }
+        catch(e) { console.warn('_a decode failed', e); return; }
+
+        if (a._src !== 'process-mining') return;
+
+        _cached_pmv = a;
+
+        // Pre-fill process name
+        if (a.process) {
+            document.getElementById('q_process_name').value = a.process;
+        }
+
+        // Pre-fill steps (map uniqueActivities count to select option values)
+        if (a.pmv_uniqueActivities) {
+            const stepsSelect = document.getElementById('q_steps');
+            const count = Number(a.pmv_uniqueActivities);
+            let val;
+            if (count <= 10)      val = '0.1';
+            else if (count <= 15) val = '0.2';
+            else if (count <= 25) val = '0.4';
+            else if (count <= 40) val = '0.6';
+            else                  val = '1';
+            if (stepsSelect.querySelector('option[value="' + val + '"]')) {
+                stepsSelect.value = val;
+            }
+        }
+
+        // Pre-fill exception rate (%)
+        if (a.pmv_incompleteCases !== undefined && a.pmv_totalCases) {
+            const pct = Math.round((Number(a.pmv_incompleteCases) / Number(a.pmv_totalCases)) * 100);
+            document.getElementById('q_exceptions').value = Math.min(100, pct);
+        }
+
+        // Pre-fill notes with PMV context
+        const noteText = [
+            a.pmv_context || '',
+            a.pmv_transitionsSummary || '',
+            a.pmv_aiAnalysis ? 'AI Analysis available in Process Mining Visualizer.' : ''
+        ].filter(Boolean).join('\n\n');
+        if (noteText) {
+            const noteEl = document.querySelector('textarea[name="Note_Steps"]')
+                        || document.querySelector('textarea[name="Note_Input_Types"]');
+            if (noteEl) noteEl.value = '[Process Mining Import]\n' + noteText.substring(0, 500);
+        }
+
+        // Show import banner with case count
+        const banner = document.getElementById('pmv-import-banner');
+        const bannerText = document.getElementById('pmv-import-banner-text');
+        if (banner && bannerText && a.pmv_totalCases) {
+            bannerText.textContent = '✦ Process Mining data imported — '
+                + a.pmv_totalCases + ' cases, ' + a.pmv_uniqueActivities + ' activities. '
+                + 'Review pre-filled fields and complete remaining questions.';
+            banner.style.display = 'block';
+        } else if (banner) {
+            banner.style.display = 'block';
+        }
+    })();
+
+    const form = document.getElementById('assessment-form');
+
+    const alertEliminatory = document.getElementById('eliminatory-alert');
+    const txtEliminatory   = document.getElementById('eliminatory-reason');
+    const alertPostponement = document.getElementById('postponement-alert');
+    const txtPostponement  = document.getElementById('postponement-reason');
+
+    const resEase      = document.getElementById('res_ease');
+    const resEaseDesc  = document.getElementById('res_ease_desc');
+    const resBenefit   = document.getElementById('res_benefit');
+    const resBenefitDesc = document.getElementById('res_benefit_desc');
+    const resBandwidth = document.getElementById('res_bandwidth');
+
+    function calculate() {
+        alertEliminatory.style.display = 'none';
+        alertPostponement.style.display = 'none';
+        document.body.classList.remove('form-halted');
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active-gate'));
+
+        const inputType  = document.getElementById('q_input_types').value;
+        const ruleBased  = document.getElementById('q_rule_based').value;
+        const processStab = document.getElementById('q_process_stability').value;
+        const appsStab   = document.getElementById('q_apps_stability').value;
+
+        // 1. Eliminatory
+        let elimReasons = [];
+        if (inputType === "Not digital and Unstructured") {
+            elimReasons.push("Input Type is Not Digital and Unstructured.");
+        }
+        if (ruleBased === "Mostly subjective" || ruleBased === "Exclusively Subjective") {
+            elimReasons.push("Process is mostly or exclusively subjective.");
+        }
+
+        if (elimReasons.length > 0) {
+            alertEliminatory.style.display = 'block';
+            txtEliminatory.innerText = elimReasons.join(" And, ") + " Low Feasibility.";
+            document.body.classList.add('form-halted');
+            document.getElementById('section-input-types').classList.add('active-gate');
+            resetDashboard();
+            return;
+        }
+
+        // 2. Postponement
+        let postReasons = [];
+        let postNodes   = [];
+        if (processStab === "postpone") {
+            postReasons.push("Significant changes expected in process.");
+            postNodes.push('section-process-stability');
+        }
+        if (appsStab === "postpone") {
+            postReasons.push("Significant changes expected in applications.");
+            postNodes.push('section-apps-stability');
+        }
+
+        if (postReasons.length > 0) {
+            alertPostponement.style.display = 'block';
+            txtPostponement.innerText = postReasons.join(" And, ") + " Postpone assessment.";
+            document.body.classList.add('form-halted');
+            postNodes.forEach(id => document.getElementById(id).classList.add('active-gate'));
+            resetDashboard();
+            return;
+        }
+
+        // Scores
+        const val = id => Math.max(0, parseFloat(document.getElementById(id).value) || 0);
+
+        const pStab    = val('q_process_stability');
+        const appsCount = val('q_apps_count');
+        const steps    = val('q_steps');
+        const decisions = val('q_decisions');
+        const thinClient = val('q_thin_client') || 1;
+        const ocr      = val('q_ocr') || 1;
+        const structured = val('q_structured');
+
+        const implementationEffort = ((0.1 * pStab) + (0.1 * appsCount) + (0.1 * steps) + (0.3 * decisions) + (0.4 * structured)) * thinClient * ocr;
+        const cappedEffort = Math.min(implementationEffort, 1.0);
+
+        let easeDesc = "";
+        if (cappedEffort <= 0.35)      easeDesc = "Low Effort";
+        else if (cappedEffort <= 0.65) easeDesc = "Medium Effort";
+        else                           easeDesc = "High Effort";
+
+        const digitalPct    = Math.min(100, val('q_digital_pct')) / 100;
+        const exceptionsPct = Math.min(100, val('q_exceptions')) / 100;
+
+        let benefitScore = digitalPct * (1 - exceptionsPct - (0.5 * structured) - (0.1 * decisions));
+        if (benefitScore < 0) benefitScore = 0;
+
+        let benefitDesc = "";
+        if (benefitScore <= 0.10)      benefitDesc = "Low Benefit";
+        else if (benefitScore <= 0.35) benefitDesc = "Medium Low Benefit";
+        else if (benefitScore < 0.65)  benefitDesc = "Medium High Benefit";
+        else                           benefitDesc = "High Benefit";
+
+        const freqMulti = document.getElementById('q_frequency').value;
+        const vol       = document.getElementById('q_volume').value;
+        const aht       = document.getElementById('q_aht').value;
+
+        let bandwidth = "—";
+        if (freqMulti && vol !== "" && aht !== "") {
+            bandwidth = (benefitScore * (parseFloat(freqMulti) * parseFloat(vol) * parseFloat(aht) / 60)).toFixed(0);
+        }
+
+        resEase.innerText      = (cappedEffort * 100).toFixed(1) + "%";
+        resEaseDesc.innerText  = easeDesc;
+        resBenefit.innerText   = (benefitScore * 100).toFixed(1) + "%";
+        resBenefitDesc.innerText = benefitDesc;
+        resBandwidth.innerText = bandwidth;
+
+        document.getElementById('pdd-btn-wrap').classList.add('visible');
+    }
+
+    function resetDashboard() {
+        resEase.innerText       = "—";
+        resEaseDesc.innerText   = "awaiting input";
+        resBenefit.innerText    = "—";
+        resBenefitDesc.innerText = "awaiting input";
+        resBandwidth.innerText  = "—";
+        document.getElementById('pdd-btn-wrap').classList.remove('visible');
+    }
+
+    form.addEventListener('input', calculate);
+    form.addEventListener('change', calculate);
+
+    // ── Send to PDD / Agent Planner ───────────────────────────────────────
+    function getAssessmentParams() {
+        const processName  = document.getElementById('q_process_name').value.trim();
+        const easeRaw      = parseFloat(resEase.innerText) || 0;
+        const benefitRaw   = parseFloat(resBenefit.innerText) || 0;
+        const bandwidthRaw = resBandwidth.innerText;
+
+        const noteFields = document.querySelectorAll('textarea[name^="Note_"]');
+        const contextParts = [];
+        noteFields.forEach(ta => {
+            const v = ta.value.trim();
+            if (v) contextParts.push(v);
+        });
+        const contextRaw = contextParts.join(' | ');
+        const context = contextRaw.length > 500 ? contextRaw.substring(0, 497) + '...' : contextRaw;
+
+        const freqEl   = document.getElementById('q_frequency');
+        const freqText = freqEl.selectedIndex > 0 ? freqEl.options[freqEl.selectedIndex].text : '';
+
+        const appsEl   = document.getElementById('q_apps_count');
+        const appsText = appsEl.selectedIndex > 0 ? appsEl.options[appsEl.selectedIndex].text : '';
+
+        const stepsEl   = document.getElementById('q_steps');
+        const stepsText = stepsEl.selectedIndex > 0 ? stepsEl.options[stepsEl.selectedIndex].text : '';
+
+        const peaksEl   = document.getElementById('q_peaks');
+        const peaksText = peaksEl.selectedIndex > 0 ? peaksEl.options[peaksEl.selectedIndex].text : '';
+
+        const thinClientEl   = document.getElementById('q_thin_client');
+        const thinClientText = (thinClientEl.selectedIndex > 0 ? thinClientEl.options[thinClientEl.selectedIndex].text : 'No').toLowerCase() === 'yes' ? 'yes' : 'no';
+
+        const ocrEl   = document.getElementById('q_ocr');
+        const ocrText = (ocrEl.selectedIndex > 0 ? ocrEl.options[ocrEl.selectedIndex].text : 'No').toLowerCase() === 'yes' ? 'yes' : 'no';
+
+        const exceptionsRaw = document.getElementById('q_exceptions').value;
+        const volumeRaw     = document.getElementById('q_volume').value;
+        const ahtRaw        = document.getElementById('q_aht').value;
+
+        const payload = {
+            _src:        'assessment',
+            process:     processName,
+            ease:        easeRaw.toFixed(1),
+            benefit:     benefitRaw.toFixed(1),
+            bandwidth:   bandwidthRaw !== '—' ? bandwidthRaw : '',
+            exceptions:  exceptionsRaw,
+            apps:        appsText,
+            freq:        freqText,
+            volume:      volumeRaw,
+            aht:         ahtRaw,
+            steps:       stepsText,
+            peaks:       peaksText,
+            thin_client: thinClientText,
+            ocr:         ocrText,
+            context:     context
+        };
+
+        // Merge cached PMV data if present (bridge mode)
+        if (_cached_pmv) {
+            Object.keys(_cached_pmv).forEach(k => {
+                if (k.startsWith('pmv_') || k === '_has_pmv') {
+                    payload[k] = _cached_pmv[k];
+                }
+            });
+            payload._chain = 'process-mining,assessment';
+        }
+
+        return new URLSearchParams({ _a: encodeA(payload) });
+    }
+
+    function sendToRPA() {
+        const params = getAssessmentParams();
+        window.open('PDD planner.html?' + params.toString(), '_blank');
+    }
+
+    function sendToAgent() {
+        const params = getAssessmentParams();
+        window.open('Agentic Automation Planner.html?' + params.toString(), '_blank');
+    }
+
+    function sendToROI() {
+        const params = getAssessmentParams();
+        window.open('Business_Case_Builder.html?' + params.toString(), '_blank');
+    }
+
+    // ── AI Integration ────────────────────────────────────────────
+    let isSubmitting = false;
+    const btn = document.getElementById('btn_analyze');
+    const originalBtnHTML = btn.innerHTML;
+
+    // --- CONFIGURATION ---
+    const PROXY_URL = 'https://nameless-sky-595c.joshuatutuianu128.workers.dev/';
+
+    const SYSTEM_PROMPT = `You are an expert RPA Business Analyst and automation consultant. You are reviewing a completed Process Assessment scorecard.
+
+Your job is to:
+1. Provide a clear narrative interpretation of the scores (Ease of Implementation, Benefit/Suitability, Bandwidth Freed).
+2. Identify any risks or concerns that the hard numeric scores do NOT capture, based on the contextual notes provided by the analyst.
+3. Give a final recommendation: one of — PROCEED (automate now), INVESTIGATE FURTHER (needs more analysis), or DO NOT AUTOMATE (not suitable).
+4. Format your response using clear headers and bullet points. Be direct and concise.`;
+
+    const savedKey = localStorage.getItem('gemini_api_key');
+    const savedUrl = localStorage.getItem('custom_endpoint');
+    const savedModel = localStorage.getItem('custom_model');
+
+    if (savedKey) document.getElementById('api_key').value = savedKey;
+    if (savedUrl) document.getElementById('customEndpoint').value = savedUrl;
+    if (savedModel) document.getElementById('customModel').value = savedModel;
+
+    function updateProxyStatus() {
+        const isManual = document.getElementById('keyToggle').checked;
+        const badge = document.getElementById('proxyBadge');
+        if (badge) {
+            badge.textContent = isManual ? 'Custom API' : 'Proxy Active';
+            badge.style.background = isManual ? 'var(--warning)' : 'var(--navy)';
+        }
+    }
+
+    ['api_key', 'customEndpoint', 'customModel'].forEach(id => {
+        document.getElementById(id).addEventListener('input', e => {
+            const key = id === 'api_key' ? 'gemini_api_key' : id === 'customEndpoint' ? 'custom_endpoint' : 'custom_model';
+            localStorage.setItem(key, e.target.value.trim());
+            updateProxyStatus();
+        });
+    });
+
+    function toggleManualKey() {
+        const bar = document.getElementById('apiKeyBar');
+        const isChecked = document.getElementById('keyToggle').checked;
+        bar.classList.toggle('hidden', !isChecked);
+        updateProxyStatus();
+    }
+
+    function clearApiKey() {
+        if(!confirm('Reset custom configuration to defaults?')) return;
+        document.getElementById('api_key').value = '';
+        document.getElementById('customEndpoint').value = '';
+        document.getElementById('customModel').value = '';
+        localStorage.removeItem('gemini_api_key');
+        localStorage.removeItem('custom_endpoint');
+        localStorage.removeItem('custom_model');
+        updateProxyStatus();
+        showToast('Configuration cleared.');
+    }
+
+    updateProxyStatus();
+
+    btn.addEventListener('click', async () => {
+        if (isSubmitting) return;
+
+        const customUrl  = document.getElementById('customEndpoint').value.trim();
+        const apiKey     = document.getElementById('api_key').value.trim();
+        const customModel= document.getElementById('customModel').value.trim();
+        const responseDiv = document.getElementById('ai-response');
+        const useProxy   = !document.getElementById('keyToggle').checked;
+
+        if (useProxy && (!PROXY_URL || PROXY_URL.includes('your-worker-name'))) {
+            document.getElementById('keyToggle').click();
+            alert("Please configure the Proxy URL or provide a Custom API Key.");
+            return;
+        }
+
+        let formIncomplete = false;
+        const skipIds = ['q_employees', 'q_errors', 'q_peaks'];
+        document.querySelectorAll('.question-group select, .question-group input[type="number"]').forEach(input => {
+            if (!skipIds.includes(input.id) && !input.value) {
+                formIncomplete = true;
+            }
+        });
+
+        if (formIncomplete) {
+            alert("Please complete all numeric and dropdown fields in the assessment before generating an AI recommendation.");
+            return;
+        }
+
+        isSubmitting = true;
+        btn.disabled = true;
+        btn.innerText = 'Analyzing...';
+        responseDiv.style.display = 'block';
+        responseDiv.innerHTML = 'Connecting to AI...';
+        document.getElementById('proxy-fallback-msg').classList.add('hidden');
+
+        let contextData = "Process Assessment Data:\n\n";
+
+        document.querySelectorAll('.question-group').forEach(group => {
+            const label = group.querySelector('.question-label').innerText;
+            const input = group.querySelector('select, input');
+            const note  = group.querySelector('textarea').value;
+
+            let valText = input.value;
+            if (input.tagName === 'SELECT' && input.selectedIndex > 0) {
+                valText = input.options[input.selectedIndex].text;
+            }
+
+            contextData += `Q: ${label}\nA: ${valText}\nNote: ${note || 'None'}\n\n`;
+        });
+
+        contextData += `--- SCORES ---\nEase of Implementation: ${resEase.innerText} (${resEaseDesc.innerText})\n`;
+        contextData += `Benefit/Suitability: ${resBenefit.innerText} (${resBenefitDesc.innerText})\n`;
+        contextData += `Bandwidth Freed: ${resBandwidth.innerText} hours/year\n`;
+
+        const prompt = `You are an expert RPA Business Analyst. I have completed a Process Assessment using our scorecard model. 
+Please review the following raw inputs, scores, and contextual notes. 
+Provide a narrative interpretation of the results, flag any risks the hard score doesn't capture based on the notes, and give a final recommendation on whether we should proceed with automating this process.
+
+${contextData}`;
+
+        try {
+            let endpoint, body;
+
+            if (useProxy) {
+                endpoint = PROXY_URL;
+                body = {
+                    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.7, maxOutputTokens: 8000 }
+                };
+            } else {
+                endpoint = customUrl || 'https://api.openai.com/v1/chat/completions';
+                body = {
+                    model: customModel || 'gpt-4o',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.7
+                };
+            }
+
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(useProxy ? {} : { 'Authorization': `Bearer ${apiKey}` })
+                },
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+
+            if (data.error) {
+                throw new Error(data.error.message || JSON.stringify(data.error));
+            }
+
+            let reply = '';
+            if (useProxy) {
+                reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+            } else {
+                reply = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+            }
+
+            responseDiv.innerHTML = formatAIResponse(reply);
+
+        } catch (error) {
+            console.error(error);
+            responseDiv.innerHTML = '<em>Error processing request.</em>';
+            if (useProxy) document.getElementById('proxy-fallback-msg').classList.remove('hidden');
+        } finally {
+            isSubmitting = false;
+            btn.disabled = false;
+            btn.innerHTML = originalBtnHTML;
+        }
+    });
+
+    function formatAIResponse(text) {
+        if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+            return DOMPurify.sanitize(marked.parse(text));
+        }
+        return text.replace(/</g, '<').replace(/>/g, '>').replace(/\n/g, '<br>');
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function clearAll() {
+        if (!confirm('Clear all form data and start fresh?')) return;
+        document.querySelectorAll('#assessment-form select').forEach(el => { el.selectedIndex = 0; });
+        document.querySelectorAll('#assessment-form input[type="number"]').forEach(el => { el.value = ''; });
+        document.querySelectorAll('#assessment-form input[type="text"]').forEach(el => { el.value = ''; });
+        document.querySelectorAll('#assessment-form textarea').forEach(el => { el.value = ''; });
+        document.getElementById('ai-response').style.display = 'none';
+        document.getElementById('ai-response').innerHTML = '';
+        document.getElementById('proxy-fallback-msg').classList.add('hidden');
+        alertEliminatory.style.display = 'none';
+        alertPostponement.style.display = 'none';
+        document.body.classList.remove('form-halted');
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active-gate'));
+        calculate();
+        _cached_pmv = null;
+        document.getElementById('pmv-import-banner').style.display = 'none';
+        showToast('Form cleared.');
+    }
+
+    // ── Named-slot localStorage Save / Load ──────────────────────
+    const STORAGE_KEY = 'rpa_assessments_v1';
+
+    function getAllSaved() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+        catch { return {}; }
+    }
+
+    function refreshSavedList() {
+        const saved = getAllSaved();
+        const select = document.getElementById('savedList');
+        const current = select.value;
+        select.innerHTML = '<option value="">— load a saved assessment —</option>';
+        Object.keys(saved).sort((a, b) => saved[b].ts - saved[a].ts).forEach(key => {
+            const opt = document.createElement('option');
+            opt.value = key;
+            const d = new Date(saved[key].ts);
+            opt.textContent = `${key}  (${d.toLocaleDateString()})`;
+            select.appendChild(opt);
+        });
+        if (current && saved[current]) select.value = current;
+    }
+
+    function saveAssessment() {
+        const name = document.getElementById('q_process_name').value.trim();
+        if (!name) { showToast('Add a Process Name first.'); return; }
+        const saved = getAllSaved();
+        if (saved[name] && !confirm(`Overwrite "${name}"?`)) return;
+        saved[name] = captureState();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+        refreshSavedList();
+        document.getElementById('savedList').value = name;
+        showToast(`Saved: ${name} ✓`);
+    }
+
+    function loadSelected() {
+        const key = document.getElementById('savedList').value;
+        if (!key) return;
+        const saved = getAllSaved();
+        if (!saved[key]) return;
+        const hasData = [...document.querySelectorAll('#assessment-form select, #assessment-form input[type="number"]')]
+            .some(el => el.value);
+        if (hasData && !confirm('Load this assessment? Unsaved changes will be lost.')) {
+            document.getElementById('savedList').value = '';
+            return;
+        }
+        applyState(saved[key]);
+        showToast(`Loaded: ${key}`);
+    }
+
+    function deleteSelected() {
+        const key = document.getElementById('savedList').value;
+        if (!key) { showToast('Select an assessment to delete.'); return; }
+        if (!confirm(`Delete "${key}"?`)) return;
+        const saved = getAllSaved();
+        delete saved[key];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+        refreshSavedList();
+        showToast(`Deleted: ${key}`);
+    }
+
+    // Populate the dropdown on page load
+    refreshSavedList();
+
+    function captureState() {
+        const state = {
+            processName: document.getElementById('q_process_name').value,
+            inputs: {},
+            textareas: {},
+            ts: Date.now()
+        };
+        document.querySelectorAll('#assessment-form select, #assessment-form input:not([type="file"])').forEach(el => {
+            if (el.id && el.id !== 'q_process_name') {
+                state.inputs[el.id] = el.value;
+            }
+        });
+        document.querySelectorAll('#assessment-form textarea').forEach(el => {
+            if (el.name) {
+                state.textareas[el.name] = el.value;
+            }
+        });
+        return state;
+    }
+
+    function applyState(state) {
+        if (state.processName !== undefined) {
+            document.getElementById('q_process_name').value = state.processName;
+        }
+        if (state.inputs) {
+            for (const id in state.inputs) {
+                const el = document.getElementById(id);
+                if (el) el.value = state.inputs[id];
+            }
+        }
+        if (state.textareas) {
+            for (const name in state.textareas) {
+                const el = document.querySelector(`#assessment-form textarea[name="${name}"]`);
+                if (el) el.value = state.textareas[name];
+            }
+        }
+        calculate();
+    }
+
+    function exportJSON() {
+        const name = document.getElementById('q_process_name').value.trim() || 'Process_Assessment_Export';
+        const state = captureState();
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${name.replace(/\s+/g, '_').toLowerCase()}_assessment.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('JSON Exported ✓');
+    }
+
+    function importJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const state = JSON.parse(e.target.result);
+                applyState(state);
+                showToast('JSON Imported ✓');
+            } catch (err) {
+                alert('Invalid JSON file.');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+</script>
+
+<div class="toast" id="toast"></div>
+
+</body>
+</html>

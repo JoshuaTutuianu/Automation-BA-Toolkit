@@ -1,0 +1,21 @@
+{
+  "projectName": "AP Invoice Processing",
+  "fields": [
+    "600",
+    "80",
+    "3000",
+    "1860",
+    "300",
+    "300000",
+    "Achieves zero human error in invoice data entry into NetSuite and guarantees an automatic, complete digital audit trail for financial reporting.",
+    "Reduces the highly repetitive and mundane copy-paste tasks for the AP team, increasing team satisfaction and reducing employee turnover.",
+    "Exception rate assessed at 5%, requiring robust human-in-the-loop fallback.",
+    "Potential system latency in NetSuite will be mitigated by implementing dynamic waits in the RPA code. UI updates or changes will be addressed by establishing a rigid change management process with the NetSuite administration team to notify of changes 2 weeks in advance.",
+    "The automation of AP Invoice Processing presents a highly compelling business case. With a modest implementation cost of EUR 15,000, it delivers a massive 255% ROI within the first 12 months, recovering all initial development costs in less than 3 months. By freeing up 1,860 man-hours annually, it alleviates repetitive manual workload for the AP team, completely eliminates costly invoice data entry errors, and establishes a secure, auditable, and standard financial log in NetSuite. I strongly recommend immediate project kickoff.",
+    "AP Process Owner, NetSuite ERP Admin, IT Security Lead, RPA Lead Developer."
+  ],
+  "selects": [
+    "Proceed"
+  ],
+  "ts": 1779229283668
+}

@@ -1,0 +1,35 @@
+{
+  "projectName": "AP Invoice Processing",
+  "time": "open",
+  "fields": [
+    "invoice is filled",
+    "ID, amount, currency, PDF format",
+    "Imported Assessment Metrics:\nFrequency: Monthly. Volume per cycle: 500 transactions. Average Handle Time: 20 min. Estimated bandwidth freed: 1860 man-hours/year. \nAssessment Scores — Ease of Implementation: 13.0%. Benefit/Suitability: 93.0%.",
+    "idk",
+    "Imported Tooling Context:\nApplications used: 2–3 applications.",
+    "anything outside office 365",
+    "be strict. ",
+    "",
+    "Imported Limitations:\nException rate: 5%. Process steps: 15–25 steps.",
+    "awdawd",
+    "awdsaw",
+    "wadsawd",
+    "wadsawd",
+    "awdsawd",
+    "awdsawd",
+    "wadsawd",
+    "wadsawd"
+  ],
+  "checks": [
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "sliders": [
+    "10"
+  ],
+  "hook": "wadsawdsawd",
+  "ts": 1779221540795
+}
