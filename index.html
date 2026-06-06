@@ -399,61 +399,61 @@
                 <!-- TITLE -->
                 <text x="460" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#6B6B6B" letter-spacing="2" text-transform="uppercase">DESIGNED WORKFLOW — TOOLS ARE USED IN SEQUENCE</text>
 
-                <!-- ═══ ROW 1: Main horizontal flow ═══ -->
+                <!-- ═══ ALL ARROWS (drawn first so they render behind nodes) ═══ -->
+
+                <!-- Solid: PMV → Assessment -->
+                <line x1="175" y1="78" x2="245" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
+
+                <!-- Solid: Assessment → PDD -->
+                <line x1="410" y1="78" x2="480" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
+
+                <!-- Solid: PDD → Business Case -->
+                <line x1="645" y1="78" x2="720" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
+
+                <!-- Dashed: PMV direct → Agentic (down then right, starts below TOOL 0 label) -->
+                <path d="M 97 130 L 97 190 L 245 190" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#arrowhead-dashed)" />
+                <text x="102" y="155" font-size="8.5" fill="#9B9B9B" font-weight="500">direct</text>
+
+                <!-- Dashed: Assessment downward → Agentic (starts below TOOL 1 label) -->
+                <line x1="332" y1="130" x2="332" y2="155" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dashed)" />
+                <text x="342" y="148" font-size="8.5" fill="#9B9B9B" font-weight="500">alternative</text>
+
+                <!-- Dashed: Agentic → Business Case (right, then up — stops below TOOL 4 label) -->
+                <path d="M 420 190 L 812 190 L 812 140" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#arrowhead-dashed)" />
+
+                <!-- ═══ ROW 1: Main horizontal flow nodes ═══ -->
+
                 <!-- PMV Node -->
                 <rect x="20" y="50" width="155" height="56" rx="6" fill="url(#grad-pmv)" />
                 <text x="97" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Process Mining</text>
-                <text x="97" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">Visualizer</text>
+                <text x="97" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#FFFFFF">Visualizer</text>
                 <text x="97" y="120" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 0</text>
-
-                <!-- Arrow PMV → Assessment -->
-                <line x1="175" y1="78" x2="245" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
 
                 <!-- Assessment Node -->
                 <rect x="255" y="50" width="155" height="56" rx="6" fill="url(#grad-asmnt)" />
                 <text x="332" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Process</text>
-                <text x="332" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">Assessment Tool</text>
+                <text x="332" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#FFFFFF">Assessment Tool</text>
                 <text x="332" y="120" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 1</text>
-
-                <!-- Arrow Assessment → PDD -->
-                <line x1="410" y1="78" x2="480" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
 
                 <!-- PDD Node -->
                 <rect x="490" y="50" width="155" height="56" rx="6" fill="url(#grad-pdd)" />
                 <text x="567" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Classic RPA</text>
-                <text x="567" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">PDD Planner</text>
+                <text x="567" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#FFFFFF">PDD Planner</text>
                 <text x="567" y="120" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 2</text>
-
-                <!-- Arrow PDD → BC -->
-                <line x1="645" y1="78" x2="720" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
 
                 <!-- Business Case Node -->
                 <rect x="730" y="50" width="165" height="56" rx="6" fill="url(#grad-bc)" />
                 <text x="812" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Business Case</text>
-                <text x="812" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">Builder</text>
+                <text x="812" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#FFFFFF">Builder</text>
                 <text x="812" y="120" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 4</text>
 
-                <!-- ═══ ROW 2: Alternative paths ═══ -->
-
-                <!-- PMV direct branches downward -->
-                <line x1="97" y1="106" x2="97" y2="165" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" />
-                <text x="102" y="165" font-size="8.5" fill="#9B9B9B" font-weight="500">direct</text>
-
-                <!-- Arrow PMV → Agentic (direct, bottom) -->
-                <line x1="175" y1="190" x2="245" y2="190" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dashed)" />
+                <!-- ═══ ROW 2: Alternative path node ═══ -->
 
                 <!-- Agentic Node (bottom center) -->
                 <rect x="255" y="162" width="165" height="56" rx="6" fill="url(#grad-agentic)" />
                 <text x="337" y="186" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Agentic</text>
-                <text x="337" y="205" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">Automation Planner</text>
+                <text x="337" y="205" text-anchor="middle" font-size="11" font-weight="500" fill="#FFFFFF">Automation Planner</text>
                 <text x="337" y="232" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 3</text>
-
-                <!-- Arrow: Assessment downward to Agentic -->
-                <line x1="332" y1="106" x2="332" y2="155" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dashed)" />
-                <text x="342" y="148" font-size="8.5" fill="#9B9B9B" font-weight="500">alternative</text>
-
-                <!-- Arrow: Agentic → Business Case (up-right diagonal) -->
-                <path d="M 420 190 L 490 190 L 490 78" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#arrowhead-dashed)" />
 
                 <!-- ═══ BOTTOM LEGEND ═══ -->
                 <line x1="200" y1="256" x2="214" y2="256" stroke="#C8893A" stroke-width="1.8" />
