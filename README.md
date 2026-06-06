@@ -12,7 +12,7 @@ No installation. No account. Runs entirely in the browser.
 
 The tools are designed to be used in sequence, with the Process Mining Visualizer as the preferred entry point:
 
-1. Open the **Process Mining Visualizer** (`index.html`)
+1. Visit the **landing page** (`index.html`) for an overview, then open the **Process Mining Visualizer** (`process-mining.html`)
 2. Upload a CSV event log — the tool maps the process flow, surfaces bottlenecks, flags outliers, and provides AI analysis
 3. Click **"Pre-fill Assessment"** to send metrics to the Assessment Tool, or send directly to a planner
 4. In the **Process Assessment Tool** (`assessment.html`), complete the remaining suitability questions

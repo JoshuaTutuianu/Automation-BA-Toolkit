@@ -1,1875 +1,570 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Process Mining Visualizer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation BA Toolkit</title>
 
-<!-- Google Fonts: Inter -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Automation BA Toolkit">
+    <meta property="og:description" content="A suite of five linked browser-based tools for the complete Business Analysis workflow — from process mining to business case.">
 
-<!-- CDN Imports -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <!-- Google Fonts: IBM Plex Sans (matches PDD, Agentic, Business Case) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-:root {
-  --bg: #F5F0E8;
-  --surface: #FFFFFF;
-  --surface-secondary: #FAF7F2;
-  --border: #E8E0D0;
-  --text-primary: #1A1A2E;
-  --text-secondary: #6B6B7B;
-  --accent: #B8860B;
-  --accent-light: #FDF6E3;
-  --danger: #C0392B;
-  --warning: #E67E22;
-  --success: #27AE60;
-  --outlier: #E67E22;
-  --node-fill: #FFFFFF;
-  --node-border: #1A1A2E;
-  --node-text: #1A1A2E;
-  --node-outlier-border: #E67E22;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family:'Inter',sans-serif; font-weight:400; font-size:14px;
-  background:var(--bg); color:var(--text-primary); line-height:1.5;
-}
-h1,h2,h3,h4,h5,h6 { font-weight:700; color:var(--text-primary); }
-.label { font-weight:600; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-secondary); }
-.card { background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,0.06); padding:24px; }
-.section-header { border-left:4px solid var(--accent); padding-left:12px; margin-bottom:16px; font-size:16px; font-weight:700; }
-.page-container { max-width:1400px; margin:0 auto; padding:0 32px; }
-.app-header { padding:32px 0 24px 0; }
-.app-header h1 { font-size:28px; margin-bottom:4px; }
-.app-header .tagline { color:var(--text-secondary); font-size:14px; }
-.upload-zone { border:2px dashed var(--border); border-radius:8px; padding:48px; background:var(--surface); text-align:center; cursor:pointer; transition:border-color 0.2s,background 0.2s; margin-bottom:24px; }
-.upload-zone.drag-over { border-color:var(--accent); background:var(--accent-light); }
-.upload-zone .upload-text { font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:8px; }
-.upload-zone .upload-subtext { font-size:13px; color:var(--text-secondary); }
-.upload-zone .error-card { background:#FFF0F0; border:1px solid var(--danger); border-radius:6px; padding:12px 16px; color:var(--danger); font-size:13px; margin-top:12px; }
-.upload-zone .sample-link { display:inline-block; margin-top:16px; font-size:13px; color:var(--accent); cursor:pointer; text-decoration:underline; }
-.upload-zone .sample-link:hover { color:#9A7209; }
-.upload-bar { display:none; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 20px; margin-bottom:24px; align-items:center; justify-content:space-between; }
-.upload-bar .file-info { font-size:14px; color:var(--text-primary); }
-.upload-bar .file-info strong { font-weight:600; }
-.upload-bar .upload-new-btn { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; }
-.upload-bar .upload-new-btn:hover { background:#9A7209; }
-.stats-bar { display:none; margin-bottom:24px; }
-.stats-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; }
-.stat-tile { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center; }
-.stat-tile .stat-label { font-weight:600; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-secondary); margin-bottom:8px; }
-.stat-tile .stat-value { font-size:28px; font-weight:700; color:var(--accent); }
-.panels-container { display:none; }
-.panels-top { display:grid; grid-template-columns:3fr 2fr; gap:24px; margin-bottom:24px; align-items:start; }
-.flow-graph-panel { height:520px; overflow:hidden; }
-.flow-graph-panel svg { width:100%; display:block; }
+    <style>
+        :root {
+            --bg: #F8F7F4;
+            --surface: #FFFFFF;
+            --surface2: #FAFAF8;
+            --border: #E2E0DB;
+            --border-input: #D0CEC9;
+            --navy: #1B3A5C;
+            --navy-dark: #142D47;
+            --amber: #C8893A;
+            --text: #1A1A1A;
+            --text-muted: #6B6B6B;
+            --danger: #C0392B;
+            --warning: #B7770D;
+            --success: #1E6B45;
+            --font: 'IBM Plex Sans', sans-serif;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+        }
 
-/* ── Dark mode scoped exclusively to flow-graph-panel ── */
-.flow-graph-panel {
-  background: #14162A;
-  border-color: #2A2D4A;
-  --node-fill: #1E2140;
-  --node-border: #5A5F8A;
-  --node-text: #E8E8F5;
-  --node-terminal-fill: #0f2a1a;
-  --node-terminal-border: #27AE60;
-  --node-alt-terminal-fill: #1e1030;
-  --node-alt-terminal-border: #9B59B6;
-}
-.flow-graph-panel .section-header { color: #E8E8F5; }
-.flow-graph-panel .graph-legend { color: #9A9DB8; }
-.flow-graph-panel .legend-thickness .thin-line,
-.flow-graph-panel .legend-thickness .thick-line { background: #9A9DB8; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── Frequency filter bar (dark-scoped) ── */
-.flow-graph-panel .freq-filter-bar {
-  display: none;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0 4px 0;
-  flex-wrap: wrap;
-}
-.flow-graph-panel .freq-filter-label {
-  width: 150px;
-  font-size: 12px;
-  color: #9A9DB8;
-  white-space: nowrap;
-  font-weight: 600;
-}
-.flow-graph-panel .freq-filter-label span {
-  color: #E8E8F5;
-}
-.flow-graph-panel #freqFilterSlider {
-  width: 260px;
-  flex: none;
-  accent-color: #5A7FD4;
-  cursor: pointer;
-}
-.flow-graph-panel .freq-filter-stats {
-  width: 200px;
-  font-size: 11px;
-  color: #9A9DB8;
-  white-space: nowrap;
-}
+        body {
+            font-family: var(--font);
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            font-size: 16px;
+        }
 
-.graph-legend { margin-top:16px; display:flex; gap:24px; flex-wrap:wrap; font-size:12px; color:var(--text-secondary); }
-.legend-item { display:flex; align-items:center; gap:8px; }
-.legend-thickness { display:flex; align-items:center; gap:4px; }
-.legend-thickness .thin-line { width:20px; height:2px; background:var(--text-secondary); }
-.legend-thickness .thick-line { width:20px; height:10px; background:var(--text-secondary); border-radius:2px; }
-.legend-color-bar { width:60px; height:12px; border-radius:2px; background:linear-gradient(to right,#1a9850,#ffffbf,#d73027); }
-.legend-orange-border { width:20px; height:12px; border:2.5px solid var(--node-outlier-border); border-radius:3px; background:var(--node-fill); }
-.legend-green-border { width:20px; height:12px; border:2.5px solid #27AE60; border-radius:3px; background:var(--node-fill); }
-.legend-purple-border { width:20px; height:12px; border:2.5px solid #9B59B6; border-radius:3px; background:var(--node-fill); }
-.data-dump-panel { margin-bottom:24px; }
-.tab-bar { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:16px; }
-.tab-btn { padding:10px 20px; font-size:13px; font-weight:600; color:var(--text-secondary); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; font-family:'Inter',sans-serif; transition:color 0.2s,border-color 0.2s; }
-.tab-btn:hover { color:var(--text-primary); }
-.tab-btn.active { color:var(--text-primary); border-bottom-color:var(--accent); }
-.tab-content { display:none; }
-.tab-content.active { display:block; }
-.data-table { width:100%; border-collapse:collapse; font-size:13px; }
-.data-table thead th { background:var(--surface-secondary); font-weight:600; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-secondary); padding:10px 12px; text-align:left; cursor:pointer; user-select:none; white-space:nowrap; }
-.data-table thead th:hover { color:var(--text-primary); }
-.data-table thead th .sort-arrow { margin-left:4px; font-size:10px; }
-.data-table tbody tr { background:var(--surface); }
-.data-table tbody tr:nth-child(even) { background:var(--surface-secondary); }
-.data-table tbody tr:hover { background:var(--accent-light); }
-.data-table tbody td { padding:8px 12px; border-top:1px solid var(--border); }
-.data-table .num { text-align:right; font-variant-numeric:tabular-nums; }
-.data-table .outlier-row { border-left:3px solid var(--outlier); background:#FFF8F0; }
-.data-table .outlier-row:nth-child(even) { background:#FFF8F0; }
-.data-table .happy-path-row { background:var(--accent-light); }
-.data-table .happy-path-row:nth-child(even) { background:var(--accent-light); }
-.happy-path-badge { display:inline-block; background:var(--accent); color:#fff; font-size:10px; font-weight:600; padding:2px 6px; border-radius:3px; margin-left:6px; text-transform:uppercase; letter-spacing:0.05em; }
-.outlier-panel { margin-bottom:24px; }
-.outlier-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-.count-badge { display:inline-block; background:var(--surface-secondary); border:1px solid var(--border); border-radius:12px; padding:2px 10px; font-size:12px; font-weight:600; color:var(--text-secondary); }
-.filter-bar { margin-bottom:16px; }
-.filter-bar select { padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:'Inter',sans-serif; color:var(--text-primary); background:var(--surface); cursor:pointer; }
-.multiplier-danger { color:var(--danger); font-weight:600; }
-.multiplier-warning { color:var(--warning); font-weight:600; }
-.multiplier-muted { color:var(--text-secondary); }
-.collapsible-header { display:flex; align-items:center; gap:12px; cursor:pointer; padding:12px 0; user-select:none; }
-.collapsible-header:hover { color:var(--accent); }
-.collapsible-header .collapse-icon { font-size:12px; transition:transform 0.2s; }
-.collapsible-header .collapse-icon.open { transform:rotate(90deg); }
-.collapsible-body { display:none; padding:12px 16px; background:var(--surface-secondary); border-radius:6px; font-size:13px; font-family:monospace; line-height:1.8; margin-bottom:8px; }
-.collapsible-body.open { display:block; }
-.collapsible-explanation { font-size:13px; color:var(--text-secondary); font-family:'Inter',sans-serif; }
-.ai-panel { height:520px; overflow-y:auto; }
-.ai-panel .ai-heading-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-.ai-panel .ai-heading-left { display:flex; align-items:center; gap:8px; }
-.ai-status-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; letter-spacing:0.03em; }
-.ai-status-badge.proxy { background:#1a237e; color:#fff; }
-.ai-status-badge.custom { background:var(--warning); color:#fff; }
-.ai-toggle-row { display:flex; align-items:center; gap:8px; }
-.ai-toggle-row label { font-size:12px; color:var(--text-secondary); cursor:pointer; }
-.toggle-switch { position:relative; width:36px; height:20px; display:inline-block; }
-.toggle-switch input { opacity:0; width:0; height:0; }
-.toggle-slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:var(--border); border-radius:20px; transition:0.3s; }
-.toggle-slider::before { content:""; position:absolute; height:14px; width:14px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
-.toggle-switch input:checked+.toggle-slider { background:var(--accent); }
-.toggle-switch input:checked+.toggle-slider::before { transform:translateX(16px); }
-.ai-config-bar { display:none; background:var(--surface-secondary); border:1px solid var(--border); border-radius:6px; padding:12px; margin-bottom:16px; gap:8px; flex-direction:column; }
-.ai-config-bar.open { display:flex; }
-.ai-config-bar .config-row { display:flex; gap:8px; align-items:center; }
-.ai-config-bar input { flex:1; padding:6px 10px; border:1px solid var(--border); border-radius:4px; font-size:13px; font-family:'Inter',sans-serif; color:var(--text-primary); background:var(--surface); }
-.ai-config-bar input::placeholder { color:var(--text-secondary); }
-.ai-default-state { text-align:center; padding:40px 20px; color:var(--text-secondary); }
-.ai-default-state .ai-icon { font-size:40px; margin-bottom:16px; }
-.ai-default-state p { margin-bottom:20px; font-size:14px; line-height:1.6; }
-.ai-analyze-btn { width:100%; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:12px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.2s; }
-.ai-analyze-btn:hover { background:#9A7209; }
-.ai-loading-state { display:none; text-align:center; padding:40px 20px; }
-.ai-loading-state .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px auto; }
-@keyframes spin { to { transform:rotate(360deg); } }
-.ai-loading-state p { color:var(--text-secondary); font-size:14px; }
-.ai-rendered-state { display:none; }
-.ai-section { margin-bottom:20px; }
-.ai-section h3 { border-left:4px solid var(--accent); padding-left:12px; font-size:14px; font-weight:700; margin-bottom:8px; }
-.ai-section .ai-body { font-size:13px; line-height:1.7; color:var(--text-primary); padding-left:16px; }
-.ai-regenerate-btn { background:none; border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; color:var(--text-secondary); cursor:pointer; font-family:'Inter',sans-serif; transition:border-color 0.2s,color 0.2s; }
-.ai-regenerate-btn:hover { border-color:var(--accent); color:var(--accent); }
-.ai-error-state { display:none; text-align:center; padding:40px 20px; color:var(--danger); }
-.ai-error-state p { margin-bottom:16px; }
-.ai-error-state .ai-retry-btn { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:10px 20px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; }
-.ai-error-state .ai-retry-btn:hover { background:#9A7209; }
-.ai-error-state .ai-toggle-link { color:var(--accent); cursor:pointer; text-decoration:underline; }
-.no-data-message { text-align:center; padding:32px; color:var(--text-secondary); font-size:14px; }
-.info-banner { background:var(--accent-light); border:1px solid var(--accent); border-radius:6px; padding:10px 16px; font-size:13px; color:var(--text-primary); margin-bottom:16px; }
-@media (max-width:900px) { .panels-top { grid-template-columns:1fr; } .stats-grid { grid-template-columns:repeat(3,1fr); } }
-@media (max-width:600px) { .stats-grid { grid-template-columns:repeat(2,1fr); } .page-container { padding:0 16px; } }
+        .page-container {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
 
-/* ── Export Bar ── */
-.export-bar { display:block; margin-top:24px; }
-.export-bar .export-row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
-.export-bar .export-field { flex:1; min-width:200px; }
-.export-bar .export-field input { width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:4px; font-family:'Inter',sans-serif; font-size:14px; color:var(--text-primary); background:var(--surface); }
-.export-bar .export-field input:focus { outline:none; border-color:var(--accent); }
-.btn-export { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:10px 20px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; white-space:nowrap; transition:background 0.2s; }
-.btn-export:hover { background:#9A7209; }
-.btn-export.pdd { background:#1B3A5C; }
-.btn-export.pdd:hover { background:#142D47; }
-</style>
+        /* ── Header / Hero ── */
+        .hero {
+            text-align: center;
+            padding: 4rem 0 3rem;
+        }
+
+        .hero-eyebrow {
+            font-size: 0.75rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--amber);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .hero .tagline {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            max-width: 620px;
+            margin: 0 auto 1rem;
+        }
+
+        .hero .description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 640px;
+            margin: 0 auto 1.75rem;
+            line-height: 1.7;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: var(--navy);
+            color: #FFFFFF;
+            font-family: var(--font);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .btn-primary:hover {
+            background: var(--navy-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            background: var(--surface);
+            color: var(--navy);
+            font-family: var(--font);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.6rem 1.25rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--navy);
+            background: var(--surface2);
+        }
+
+        /* ── Pipeline Diagram Section ── */
+        .pipeline-section {
+            padding: 1rem 0 3rem;
+        }
+
+        .section-header {
+            border-left: 4px solid var(--amber);
+            padding-left: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .pipeline-diagram {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            padding: 2rem 1.5rem;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        .pipeline-diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .pipeline-diagram .pipeline-caption {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+        }
+
+        .pipeline-diagram .pipeline-caption span {
+            font-weight: 600;
+            color: var(--amber);
+        }
+
+        /* ── Tools Grid ── */
+        .tools-section {
+            padding: 0 0 3rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        .tool-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .tool-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-input);
+        }
+
+        .tool-card .tool-number {
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--amber);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card .tool-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .tool-card .tool-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            flex: 1;
+            margin-bottom: 1rem;
+        }
+
+        .tool-card .tool-link {
+            align-self: flex-start;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--navy);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: color 0.2s;
+        }
+
+        .tool-card .tool-link:hover {
+            color: var(--amber);
+        }
+
+        .tool-card .tool-link .arrow {
+            transition: transform 0.2s;
+        }
+
+        .tool-card .tool-link:hover .arrow {
+            transform: translateX(3px);
+        }
+
+        /* ── Highlights ── */
+        .highlights-section {
+            padding: 0 0 3rem;
+        }
+
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        .highlight-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .highlight-card .highlight-icon {
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .highlight-card .highlight-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.4rem;
+        }
+
+        .highlight-card .highlight-desc {
+            font-size: 0.825rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── Footer ── */
+        .site-footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            text-align: center;
+            font-size: 0.825rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .site-footer a {
+            color: var(--navy);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .site-footer a:hover {
+            color: var(--amber);
+        }
+
+        .site-footer .footer-divider {
+            margin: 0 0.5rem;
+            color: var(--border-input);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .tools-grid,
+            .highlights-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .tools-grid,
+            .highlights-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 2.5rem 0 2rem;
+            }
+
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+
+            .hero .tagline {
+                font-size: 1rem;
+            }
+
+            .pipeline-diagram {
+                padding: 1rem 0.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div class="page-container">
 
-  <header class="app-header">
-    <h1>Process Mining Visualizer</h1>
-    <p class="tagline">Upload an event log CSV to map process flows, surface bottlenecks, and assess automation potential.</p>
-  </header>
+    <!-- ═══════════════ HERO ═══════════════ -->
+    <header class="hero">
+        <div class="hero-eyebrow">Business Analysis Toolsuite</div>
+        <h1>Automation BA Toolkit</h1>
+        <p class="tagline">Complete Business Analysis workflow — from process mining to business case</p>
+        <p class="description">
+            A suite of five linked browser-based tools that replicate the complete BA workflow
+            for both classic RPA and probabilistic AI agents. Built as a portfolio piece demonstrating
+            practical Business Analysis methodology — no installation, no accounts, entirely in the browser.
+        </p>
+        <a href="process-mining.html" class="btn-primary">Get Started →</a>
+    </header>
 
-  <div id="uploadZone" class="upload-zone">
-    <div class="upload-text">Drag & drop your CSV here or click to browse</div>
-    <div class="upload-subtext">Required columns: case_id, activity, timestamp (case-insensitive; supports YYYY-MM-DD HH:MM:SS and DD/MM/YYYY H:MM)</div>
-    <div class="sample-link" id="sampleLink">Download sample CSV</div>
-    <input type="file" id="fileInput" accept=".csv" style="display:none">
-    <div id="uploadError" class="error-card" style="display:none"></div>
-  </div>
+    <!-- ═══════════════ PIPELINE ═══════════════ -->
+    <section class="pipeline-section">
+        <div class="section-header">The Workflow</div>
+        <div class="pipeline-diagram">
+            <svg viewBox="0 0 920 280" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', sans-serif">
+                <defs>
+                    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#C8893A" />
+                    </marker>
+                    <marker id="arrowhead-dashed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#9B9B9B" />
+                    </marker>
+                    <linearGradient id="grad-pmv" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#1B3A5C"/>
+                        <stop offset="100%" stop-color="#2A5080"/>
+                    </linearGradient>
+                    <linearGradient id="grad-asmnt" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#1B3A5C"/>
+                        <stop offset="100%" stop-color="#2A5080"/>
+                    </linearGradient>
+                    <linearGradient id="grad-pdd" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#1B3A5C"/>
+                        <stop offset="100%" stop-color="#2A5080"/>
+                    </linearGradient>
+                    <linearGradient id="grad-agentic" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#1B3A5C"/>
+                        <stop offset="100%" stop-color="#2A5080"/>
+                    </linearGradient>
+                    <linearGradient id="grad-bc" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#1B3A5C"/>
+                        <stop offset="100%" stop-color="#2A5080"/>
+                    </linearGradient>
+                </defs>
 
-  <div id="uploadBar" class="upload-bar">
-    <div class="file-info">Loaded: <strong id="fileNameDisplay"></strong> &mdash; <span id="rowCountDisplay"></span> rows</div>
-    <button class="upload-new-btn" id="uploadNewBtn">Upload New File</button>
-  </div>
+                <!-- TITLE -->
+                <text x="460" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="#6B6B6B" letter-spacing="2" text-transform="uppercase">DESIGNED WORKFLOW — TOOLS ARE USED IN SEQUENCE</text>
 
-  <div id="statsBar" class="stats-bar">
-    <div class="stats-grid">
-      <div class="stat-tile"><div class="stat-label">Total Cases</div><div class="stat-value" id="statTotalCases">&mdash;</div></div>
-      <div class="stat-tile"><div class="stat-label">Unique Activities</div><div class="stat-value" id="statUniqueActivities">&mdash;</div></div>
-      <div class="stat-tile"><div class="stat-label">Total Events</div><div class="stat-value" id="statTotalEvents">&mdash;</div></div>
-      <div class="stat-tile"><div class="stat-label">Avg Case Duration</div><div class="stat-value" id="statAvgDuration">&mdash;</div></div>
-      <div class="stat-tile"><div class="stat-label">Outlier Cases</div><div class="stat-value" id="statOutlierCases">&mdash;</div></div>
-    </div>
-  </div>
+                <!-- ═══ ROW 1: Main horizontal flow ═══ -->
+                <!-- PMV Node -->
+                <rect x="20" y="50" width="155" height="56" rx="6" fill="url(#grad-pmv)" />
+                <text x="97" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Process Mining</text>
+                <text x="97" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">Visualizer</text>
+                <text x="97" y="120" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 0</text>
 
-  <!-- Export Bar -->
-  <div class="card export-bar" id="exportBar">
-      <h2 class="section-header">Forward to Pipeline</h2>
-      <div class="export-row">
-          <div class="export-field">
-              <label class="label" style="margin-bottom:6px;">Process Name</label>
-              <input type="text" id="pmvProcessName" placeholder="e.g. AP Invoice Processing">
-          </div>
-          <button class="btn-export pdd" id="btnSendToPDD" title="Send metrics to the structured PDD planner">Send to PDD Planner →</button>
-          <button class="btn-export" id="btnSendToAgentic" title="Send metrics to the agentic automation planner">Send to Agentic Planner →</button>
-          <button class="btn-export" id="btnSendToAssessment" title="Pre-fill the gated assessment scorecard">Pre-fill Assessment →</button>
-      </div>
-  </div>
+                <!-- Arrow PMV → Assessment -->
+                <line x1="175" y1="78" x2="245" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
 
-  <div id="panelsContainer" class="panels-container">
+                <!-- Assessment Node -->
+                <rect x="255" y="50" width="155" height="56" rx="6" fill="url(#grad-asmnt)" />
+                <text x="332" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Process</text>
+                <text x="332" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">Assessment Tool</text>
+                <text x="332" y="120" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 1</text>
 
-    <div class="panels-top">
+                <!-- Arrow Assessment → PDD -->
+                <line x1="410" y1="78" x2="480" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
 
-      <div class="card flow-graph-panel" id="flowGraphPanel">
-        <h2 class="section-header">Flow Graph</h2>
-        <svg id="flowGraphSvg"></svg>
-        <div class="freq-filter-bar" id="freqFilterBar">
-          <label class="freq-filter-label" for="freqFilterSlider">
-            Min Frequency: <span id="freqFilterValue">0</span>
-          </label>
-          <input type="range" id="freqFilterSlider" min="0" max="0" value="0" step="1">
-          <span class="freq-filter-stats" id="freqFilterStats"></span>
+                <!-- PDD Node -->
+                <rect x="490" y="50" width="155" height="56" rx="6" fill="url(#grad-pdd)" />
+                <text x="567" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Classic RPA</text>
+                <text x="567" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">PDD Planner</text>
+                <text x="567" y="120" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 2</text>
+
+                <!-- Arrow PDD → BC -->
+                <line x1="645" y1="78" x2="720" y2="78" stroke="#C8893A" stroke-width="1.8" marker-end="url(#arrowhead)" />
+
+                <!-- Business Case Node -->
+                <rect x="730" y="50" width="165" height="56" rx="6" fill="url(#grad-bc)" />
+                <text x="812" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Business Case</text>
+                <text x="812" y="93" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">Builder</text>
+                <text x="812" y="120" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 4</text>
+
+                <!-- ═══ ROW 2: Alternative paths ═══ -->
+
+                <!-- PMV direct branches downward -->
+                <line x1="97" y1="106" x2="97" y2="165" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" />
+                <text x="102" y="165" font-size="8.5" fill="#9B9B9B" font-weight="500">direct</text>
+
+                <!-- Arrow PMV → Agentic (direct, bottom) -->
+                <line x1="175" y1="190" x2="245" y2="190" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dashed)" />
+
+                <!-- Agentic Node (bottom center) -->
+                <rect x="255" y="162" width="165" height="56" rx="6" fill="url(#grad-agentic)" />
+                <text x="337" y="186" text-anchor="middle" font-size="12" font-weight="700" fill="#FFFFFF">Agentic</text>
+                <text x="337" y="205" text-anchor="middle" font-size="11" font-weight="500" fill="#C8D6E5">Automation Planner</text>
+                <text x="337" y="232" text-anchor="middle" font-size="9" font-weight="600" fill="#C8893A">TOOL 3</text>
+
+                <!-- Arrow: Assessment downward to Agentic -->
+                <line x1="332" y1="106" x2="332" y2="155" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dashed)" />
+                <text x="342" y="148" font-size="8.5" fill="#9B9B9B" font-weight="500">alternative</text>
+
+                <!-- Arrow: Agentic → Business Case (up-right diagonal) -->
+                <path d="M 420 190 L 490 190 L 490 78" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#arrowhead-dashed)" />
+
+                <!-- ═══ BOTTOM LEGEND ═══ -->
+                <line x1="200" y1="256" x2="214" y2="256" stroke="#C8893A" stroke-width="1.8" />
+                <text x="222" y="259" font-size="10" fill="#6B6B6B">primary path</text>
+                <line x1="350" y1="256" x2="364" y2="256" stroke="#9B9B9B" stroke-width="1.2" stroke-dasharray="4,3" />
+                <text x="372" y="259" font-size="10" fill="#6B6B6B">alternative / direct path</text>
+            </svg>
+            <p class="pipeline-caption">Tools pass data via URL parameters — <span>stateless</span>, <span>shareable</span>, and <span>independently usable</span> at any point in the workflow.</p>
         </div>
-        <div class="graph-legend" id="graphLegend">
-          <div class="legend-item"><div class="legend-thickness"><span class="thin-line"></span><span>&rarr;</span><span class="thick-line"></span></div><span>Low Volume &rarr; High Volume</span></div>
-          <div class="legend-item"><div class="legend-color-bar"></div><span>Fast &rarr; Slow</span></div>
-          <div class="legend-item"><div class="legend-orange-border"></div><span>High outlier concentration</span></div>
-          <div class="legend-item"><div class="legend-green-border"></div><span>Main terminal (process end)</span></div>
-          <div class="legend-item"><div class="legend-purple-border"></div><span>Alt terminal (early exit)</span></div>
+    </section>
+
+    <!-- ═══════════════ TOOLS ═══════════════ -->
+    <section class="tools-section">
+        <div class="section-header">The Tools</div>
+        <div class="tools-grid">
+
+            <!-- Tool 0 -->
+            <div class="tool-card">
+                <div class="tool-number">Tool 0 · Entry Point</div>
+                <div class="tool-name">Process Mining Visualizer</div>
+                <div class="tool-desc">
+                    Upload a CSV event log to map process flows, surface bottlenecks, detect outliers, and assess automation potential with hard data before any scoping begins. Powered by D3.js flow graphs.
+                </div>
+                <a href="process-mining.html" class="tool-link">Open Tool <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Tool 1 -->
+            <div class="tool-card">
+                <div class="tool-number">Tool 1 · Assessment</div>
+                <div class="tool-name">Process Assessment Tool</div>
+                <div class="tool-desc">
+                    Based on UiPath's automation suitability scoring model. Eliminatory gates, postponement flags, and weighted scoring across ease of implementation and benefit — determines if a process is worth automating.
+                </div>
+                <a href="assessment.html" class="tool-link">Open Tool <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Tool 2 -->
+            <div class="tool-card">
+                <div class="tool-number">Tool 2 · Classic RPA</div>
+                <div class="tool-name">Classic RPA PDD Planner</div>
+                <div class="tool-desc">
+                    Structures the Process Design Document for deterministic, hard-coded robots. Maps the exact &ldquo;happy path&rdquo; with strict exception handling across 7 phases. Generates Mermaid.js flowcharts.
+                </div>
+                <a href="PDD planner.html" class="tool-link">Open Tool <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Tool 3 -->
+            <div class="tool-card">
+                <div class="tool-number">Tool 3 · AI Agents</div>
+                <div class="tool-name">Agentic Automation Planner</div>
+                <div class="tool-desc">
+                    Structures design documents for probabilistic AI agents. Maps objectives, tool boundaries, guardrails, and blast-radius containment instead of step-by-step instructions. Includes capability map generation.
+                </div>
+                <a href="Agentic Automation Planner.html" class="tool-link">Open Tool <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Tool 4 -->
+            <div class="tool-card">
+                <div class="tool-number">Tool 4 · Financial</div>
+                <div class="tool-name">Business Case Builder</div>
+                <div class="tool-desc">
+                    Structures financial justification and executive sign-off. Live ROI dashboard, Chart.js cumulative cash flow graph, and a multi-turn conversational AI CFO that challenges costs and savings assumptions.
+                </div>
+                <a href="Business_Case_Builder.html" class="tool-link">Open Tool <span class="arrow">→</span></a>
+            </div>
+
+            <!-- Spacer card for 3-col grid balance -->
+            <div class="tool-card" style="background: var(--surface2); border-style: dashed; display: flex; align-items: center; justify-content: center; text-align: center;">
+                <div style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5;">
+                    <strong style="color: var(--navy);">Need a custom workflow?</strong><br>
+                    Each tool is self-contained — start at any point in the pipeline.
+                </div>
+            </div>
+
         </div>
-      </div>
+    </section>
 
-      <div class="card ai-panel" id="aiPanel">
-        <div class="ai-heading-row">
-          <div class="ai-heading-left">
-            <h2 class="section-header" style="margin-bottom:0">AI Analysis</h2>
-            <span class="ai-status-badge proxy" id="aiStatusBadge">Proxy Active</span>
-          </div>
-          <div class="ai-toggle-row">
-            <label for="aiToggle">Custom Key</label>
-            <label class="toggle-switch">
-              <input type="checkbox" id="aiToggle">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
+    <!-- ═══════════════ HIGHLIGHTS ═══════════════ -->
+    <section class="highlights-section">
+        <div class="section-header">Why This Toolsuite</div>
+        <div class="highlights-grid">
+            <div class="highlight-card">
+                <div class="highlight-icon">🌐</div>
+                <div class="highlight-title">Zero Setup</div>
+                <div class="highlight-desc">No installation, no accounts, no build step. Every tool runs immediately in the browser — just open the HTML file.</div>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-icon">🤖</div>
+                <div class="highlight-title">AI-Powered Analysis</div>
+                <div class="highlight-desc">Built-in AI reviewer with proxy by default — no API key required. Works with any OpenAI-compatible endpoint.</div>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-icon">🔗</div>
+                <div class="highlight-title">Seamless Handoff</div>
+                <div class="highlight-desc">Tools pass complete context via URL parameters. Export at any step and share the link — no backend, no database.</div>
+            </div>
         </div>
+    </section>
 
-        <div class="ai-config-bar" id="aiConfigBar">
-          <div class="config-row"><input type="text" id="aiEndpoint" placeholder="Endpoint URL (default: https://api.openai.com/v1/chat/completions)"></div>
-          <div class="config-row"><input type="text" id="aiModel" placeholder="Model (default: gpt-4o)"></div>
-          <div class="config-row"><input type="password" id="aiApiKey" placeholder="API Key"></div>
-        </div>
-
-        <div class="ai-default-state" id="aiDefaultState">
-          <div class="ai-icon">&#x1F50D;</div>
-          <p>AI Analysis ready. Click the button below to generate insights from your process data.</p>
-          <button class="ai-analyze-btn" id="aiAnalyzeBtn">Analyze with AI</button>
-        </div>
-
-        <div class="ai-loading-state" id="aiLoadingState">
-          <div class="spinner"></div>
-          <p>Analyzing process data&hellip;</p>
-        </div>
-
-        <div class="ai-rendered-state" id="aiRenderedState">
-          <div id="aiContent"></div>
-          <button class="ai-regenerate-btn" id="aiRegenerateBtn">Regenerate Analysis</button>
-        </div>
-
-        <div class="ai-error-state" id="aiErrorState">
-          <p id="aiErrorMessage">Analysis failed. Check your network connection and try again.</p>
-          <button class="ai-retry-btn" id="aiRetryBtn">Retry</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card data-dump-panel" id="dataDumpPanel">
-      <h2 class="section-header">Data Dump</h2>
-      <div class="tab-bar">
-        <button class="tab-btn active" data-tab="transitions">Transitions</button>
-        <button class="tab-btn" data-tab="paths">Paths</button>
-        <button class="tab-btn" data-tab="nodes">Nodes</button>
-      </div>
-
-      <div class="tab-content active" id="tabTransitions">
-        <table class="data-table" id="transitionsTable">
-          <thead><tr>
-            <th data-col="transition">Transition <span class="sort-arrow"></span></th>
-            <th data-col="frequency" class="num">Frequency <span class="sort-arrow">&darr;</span></th>
-            <th data-col="avgDuration" class="num">Avg Duration (minutes) <span class="sort-arrow"></span></th>
-            <th data-col="minDuration" class="num">Fastest Case (minutes) <span class="sort-arrow"></span></th>
-            <th data-col="maxDuration" class="num">Slowest Case (minutes) <span class="sort-arrow"></span></th>
-            <th data-col="stdev" class="num">Std Dev (minutes) <span class="sort-arrow"></span></th>
-          </tr></thead>
-          <tbody id="transitionsBody"></tbody>
-        </table>
-      </div>
-
-      <div class="tab-content" id="tabPaths">
-        <table class="data-table" id="pathsTable">
-          <thead><tr>
-            <th data-col="path">Path <span class="sort-arrow"></span></th>
-            <th data-col="cases" class="num">Cases <span class="sort-arrow">&darr;</span></th>
-            <th data-col="pct" class="num">% of Total <span class="sort-arrow"></span></th>
-            <th data-col="avgDuration" class="num">Avg Total Duration (min) <span class="sort-arrow"></span></th>
-          </tr></thead>
-          <tbody id="pathsBody"></tbody>
-        </table>
-      </div>
-
-      <div class="tab-content" id="tabNodes">
-        <table class="data-table" id="nodesTable">
-          <thead><tr>
-            <th data-col="activity">Activity <span class="sort-arrow"></span></th>
-            <th data-col="casesThrough" class="num">Cases Through <span class="sort-arrow">&darr;</span></th>
-            <th data-col="avgTimeToNext" class="num">Avg Time to Next Step (min) <span class="sort-arrow"></span></th>
-          </tr></thead>
-          <tbody id="nodesBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card outlier-panel" id="outlierPanel">
-      <h2 class="section-header">Outlier Report</h2>
-
-      <div class="outlier-header">
-        <h3 style="font-size:14px;font-weight:700">Outlier Transitions</h3>
-        <span class="count-badge" id="outlierCountBadge">0 flagged</span>
-      </div>
-
-      <div class="filter-bar">
-        <select id="outlierFilter"><option value="all">All transitions</option></select>
-      </div>
-
-      <table class="data-table" id="outlierTable">
-        <thead><tr>
-          <th data-col="caseId">Case ID <span class="sort-arrow"></span></th>
-          <th data-col="from">From <span class="sort-arrow"></span></th>
-          <th data-col="to">To <span class="sort-arrow"></span></th>
-          <th data-col="actualDuration" class="num">Actual Duration (min) <span class="sort-arrow"></span></th>
-          <th data-col="avgDuration" class="num">Avg Duration (min) <span class="sort-arrow"></span></th>
-          <th data-col="multiplier" class="num">Multiplier <span class="sort-arrow">&darr;</span></th>
-        </tr></thead>
-        <tbody id="outlierBody"></tbody>
-      </table>
-
-      <div id="noOutliersMessage" class="no-data-message" style="display:none">No outliers detected.</div>
-
-      <div style="margin-top:24px">
-        <div class="collapsible-header" id="incompleteHeader">
-          <span class="collapse-icon" id="collapseIcon">&#x25B6;</span>
-          <h3 style="font-size:14px;font-weight:700">Incomplete Cases</h3>
-          <span class="count-badge" id="incompleteCountBadge">0</span>
-        </div>
-        <div class="collapsible-body" id="incompleteBody"></div>
-        <div class="collapsible-explanation" id="incompleteExplanation"></div>
-      </div>
-    </div>
-
-  </div>
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <footer class="site-footer">
+        <strong>Automation BA Toolkit</strong>
+        <span class="footer-divider">·</span>
+        <a href="https://github.com/joshdeadbody/PDD-planner">GitHub</a>
+        <span class="footer-divider">·</span>
+        MIT Licensed — free to use, modify, and deploy
+        <br>
+        Built by Tutuianu Joshua · RPA &amp; Agentic BA Portfolio
+    </footer>
 
 </div>
 
-<div id="tooltip" style="display:none;position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px;color:var(--text-primary);z-index:1000;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,0.1);max-width:300px;line-height:1.5;"></div>
-
-<script>
-/* ================================================================
-   CONSTANTS
-   ================================================================ */
-const PROXY_URL = 'https://nameless-sky-595c.joshuatutuianu128.workers.dev/';
-const SYSTEM_PROMPT = 'You are a Senior RPA Business Analyst. You will be given structured process mining data extracted from a real event log. Analyze the data and return your findings in exactly four sections with these exact headings: Process Summary, Bottlenecks, RPA Suitability Assessment, Red Flags. Be specific, quantitative where possible, and direct. No preamble.';
-
-const SAMPLE_CSV = `case_id,activity,timestamp
-1,Submit Application,2024-01-01 09:00:00
-1,Document Review,2024-01-01 10:30:00
-1,Credit Check,2024-01-01 11:00:00
-1,Approval,2024-01-02 14:00:00
-2,Submit Application,2024-01-02 08:00:00
-2,Document Review,2024-01-02 09:15:00
-2,Credit Check,2024-01-02 09:45:00
-2,Rejection,2024-01-02 10:00:00
-3,Submit Application,2024-01-03 13:00:00
-3,Document Review,2024-01-05 09:00:00
-3,Credit Check,2024-01-05 11:00:00
-3,Approval,2024-01-06 15:00:00
-4,Submit Application,2024-01-04 08:30:00
-4,Document Review,2024-01-04 10:00:00
-4,Credit Check,2024-01-04 10:30:00
-4,Approval,2024-01-05 11:00:00
-5,Submit Application,2024-01-06 09:00:00
-5,Document Review,2024-01-06 11:00:00
-5,Credit Check,2024-01-06 11:30:00
-5,Rejection,2024-01-06 12:00:00`;
-
-/* ================================================================
-   STATE
-   ================================================================ */
-let appState = null;
-let rawData = null;
-let freqFilterPct = 0;
-let maxFrequency = 0;
-let lastAiResponseText = null;  // raw markdown from most recent AI analysis
-
-function encodeA(obj) {
-    return btoa(encodeURIComponent(JSON.stringify(obj)));
-}
-
-function buildPMVPayload() {
-    const processName = document.getElementById('pmvProcessName').value.trim()
-        || ((fileNameDisplay && fileNameDisplay.textContent) || 'Untitled Process').replace(/\.csv$/i, '');
-
-    if (!appState) {
-        return {
-            _src:       'process-mining',
-            _has_pmv:   false,
-            process:    processName,
-            pmv_totalCases:         0,
-            pmv_totalEvents:        0,
-            pmv_uniqueActivities:   0,
-            pmv_avgCaseDuration:    '0.0',
-            pmv_topPath:            '',
-            pmv_topPathPct:         0,
-            pmv_outlierCount:       0,
-            pmv_incompleteCases:    0,
-            pmv_terminalActivity:   '',
-            pmv_transitionsSummary: '',
-            pmv_bottleneckNodes:    '[]',
-            pmv_aiAnalysis:         '',
-            pmv_aiAnalysisTruncated: false,
-            pmv_context:            ''
-        };
-    }
-
-    // Build transitions summary string
-    const tsParts = [];
-    for (const [key, ts] of appState.transitionStats) {
-        tsParts.push(key + ' (' + ts.frequency + ' cases, avg ' + ts.avgDuration.toFixed(1) + 'min)');
-    }
-    const transitionsSummary = tsParts.join(' | ');
-
-    // Truncate AI analysis to 3000 chars at last sentence boundary
-    let aiAnalysis = lastAiResponseText || '';
-    if (aiAnalysis.length > 3000) {
-        const sliced = aiAnalysis.substring(0, 3000);
-        const lastPeriod = Math.max(sliced.lastIndexOf('.'), sliced.lastIndexOf('\n'));
-        aiAnalysis = (lastPeriod > 2500 ? sliced.substring(0, lastPeriod + 1) : sliced) + '\n\n[truncated for transfer]';
-    }
-
-    const topPath = appState.pathStats[0];
-    const bottleneckNodes = [];
-    for (const [activity, ns] of appState.nodeStats) {
-        if (appState.uniqueActivities.length > 0 && appState.avgCaseDuration > 0) {
-            const avgMinPerActivity = (appState.avgCaseDuration * 60) / appState.uniqueActivities.length;
-            if (ns.avgTimeToNext > avgMinPerActivity * 1.5) {
-                bottleneckNodes.push(activity);
-            }
-        }
-    }
-
-    return {
-        _src:       'process-mining',
-        _has_pmv:   true,
-        process:    processName,
-
-        pmv_totalCases:         appState.totalCases,
-        pmv_totalEvents:        appState.totalEvents,
-        pmv_uniqueActivities:   appState.uniqueActivities.length,
-        pmv_avgCaseDuration:    appState.avgCaseDuration.toFixed(1),
-        pmv_topPath:            topPath ? topPath.path : '',
-        pmv_topPathPct:         topPath ? Math.round((topPath.frequency / appState.totalCases) * 100) : 0,
-        pmv_outlierCount:       appState.outliers.length,
-        pmv_incompleteCases:    appState.incompleteCases.length,
-        pmv_terminalActivity:   appState.terminalActivity,
-        pmv_transitionsSummary: transitionsSummary.substring(0, 2000),
-        pmv_bottleneckNodes:    JSON.stringify(bottleneckNodes.slice(0, 5)),
-        pmv_aiAnalysis:         aiAnalysis,
-        pmv_aiAnalysisTruncated: lastAiResponseText && lastAiResponseText.length > 3000 ? true : false,
-        pmv_context:            (lastAiResponseText || transitionsSummary).substring(0, 500)
-    };
-}
-
-function sendPMVTo(targetUrl) {
-    const payload = buildPMVPayload();
-    const params = new URLSearchParams({ _a: encodeA(payload) });
-    window.open(targetUrl + '?' + params.toString(), '_blank');
-}
-
-function sendToPDD()      { sendPMVTo('PDD planner.html'); }
-function sendToAgentic()  { sendPMVTo('Agentic Automation Planner.html'); }
-function sendToAssessment(){ sendPMVTo('assessment.html'); }
-
-/* ================================================================
-   DOM REFS
-   ================================================================ */
-const $ = id => document.getElementById(id);
-const uploadZone = $('uploadZone');
-const fileInput = $('fileInput');
-const uploadError = $('uploadError');
-const uploadBar = $('uploadBar');
-
-/* ── Utility: debounce — delays fn execution until `ms` of inactivity ── */
-function debounce(fn, ms) {
-  let timer;
-  return function(...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), ms);
-  };
-}
-
-/* ── Flow graph zoom (created once to avoid accumulating listeners per render) ── */
-const graphSvgEl = document.getElementById('flowGraphSvg');
-const graphZoom = d3.zoom()
-  .scaleExtent([0.15, 4])
-  .on('zoom', function(event) {
-    d3.select(graphSvgEl).select('.graph-content').attr('transform', event.transform);
-  });
-d3.select(graphSvgEl).call(graphZoom);
-
-const fileNameDisplay = $('fileNameDisplay');
-const rowCountDisplay = $('rowCountDisplay');
-const uploadNewBtn = $('uploadNewBtn');
-const sampleLink = $('sampleLink');
-const statsBar = $('statsBar');
-const panelsContainer = $('panelsContainer');
-const tooltip = $('tooltip');
-
-/* ================================================================
-   UPLOAD ZONE
-   ================================================================ */
-uploadZone.addEventListener('click', function(e) {
-  if (e.target === sampleLink) return;
-  fileInput.click();
-});
-
-fileInput.addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (file) handleFile(file);
-});
-
-uploadZone.addEventListener('dragover', function(e) {
-  e.preventDefault();
-  uploadZone.classList.add('drag-over');
-});
-
-uploadZone.addEventListener('dragleave', function(e) {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
-});
-
-uploadZone.addEventListener('drop', function(e) {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
-});
-
-uploadNewBtn.addEventListener('click', function() {
-  resetUpload();
-  fileInput.click();
-});
-
-sampleLink.addEventListener('click', function(e) {
-  e.stopPropagation();
-  downloadSampleCSV();
-});
-
-function downloadSampleCSV() {
-  const blob = new Blob([SAMPLE_CSV], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'sample_event_log.csv';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function resetUpload() {
-  uploadZone.style.display = 'block';
-  uploadBar.style.display = 'none';
-  uploadError.style.display = 'none';
-  uploadError.textContent = '';
-  fileInput.value = '';
-  statsBar.style.display = 'none';
-  panelsContainer.style.display = 'none';
-  appState = null;
-  rawData = null;
-  freqFilterPct = 0;
-  maxFrequency = 0;
-  freqFilterSlider.value = 0;
-  freqFilterBar.style.display = 'none';
-  freqFilterStats.textContent = '';
-  freqFilterValue.textContent = '0';
-  const banner = document.getElementById('infoBanner');
-  if (banner) banner.style.display = 'none';
-  document.getElementById('pmvProcessName').value = '';
-  lastAiResponseText = null;
-}
-
-function showInfoBanner(msg) {
-  let banner = document.getElementById('infoBanner');
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'infoBanner';
-    banner.className = 'info-banner';
-    uploadBar.parentNode.insertBefore(banner, uploadBar);
-  }
-  banner.innerHTML = msg;
-  banner.style.display = 'block';
-}
-
-/* ================================================================
-   HANDLE FILE
-   ================================================================ */
-function handleFile(file) {
-  uploadError.style.display = 'none';
-  uploadError.textContent = '';
-
-  Papa.parse(file, {
-    header: true,
-    transformHeader: h => h.replace(/^\uFEFF/, '').trim().toLowerCase().replace(/\s+/g, '_'),
-    skipEmptyLines: true,
-    complete: function(results) {
-      if (results.errors && results.errors.length > 0) {
-        showUploadError('Error parsing CSV: ' + results.errors[0].message);
-        return;
-      }
-      const rows = results.data;
-      if (!rows || rows.length === 0) {
-        showUploadError('CSV file is empty.');
-        return;
-      }
-      processParsedRows(rows, file.name);
-    },
-    error: function(err) {
-      showUploadError('Failed to read file: ' + err.message);
-    }
-  });
-}
-
-function showUploadError(msg) {
-  uploadError.textContent = msg;
-  uploadError.style.display = 'block';
-}
-
-/* ================================================================
-   TIMESTAMP PARSER
-   ================================================================ */
-/**
- * Parse a timestamp string into a Date object.
- * Handles MM/DD/YYYY H:MM explicitly (cross-browser safe),
- * falls back to new Date() for ISO 8601 and other formats.
- */
-function parseTimestamp(str) {
-  // Explicit: DD/MM/YYYY H:MM or DD/MM/YYYY HH:MM (no seconds, no AM/PM)
-  const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
-  if (m) {
-    const [, dy, mo, yr, hr, mn] = m;
-    // Reconstruct as ISO 8601 — guaranteed cross-browser (Chrome, Firefox, Safari)
-    return new Date(
-      yr + '-' + mo.padStart(2, '0') + '-' + dy.padStart(2, '0') +
-      'T' + hr.padStart(2, '0') + ':' + mn + ':00'
-    );
-  }
-  // Explicit: DD/MM/YYYY H:MM:SS (with seconds)
-  const m2 = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/);
-  if (m2) {
-    const [, dy, mo, yr, hr, mn, sc] = m2;
-    return new Date(
-      yr + '-' + mo.padStart(2, '0') + '-' + dy.padStart(2, '0') +
-      'T' + hr.padStart(2, '0') + ':' + mn + ':' + sc
-    );
-  }
-  // Fallback: handles ISO 8601 (YYYY-MM-DD HH:MM:SS) and other formats
-  return new Date(str);
-}
-
-/* ================================================================
-   PROCESS PARSED ROWS
-   ================================================================ */
-function processParsedRows(rows, fileName) {
-  // Normalize column names — strip BOM, backslashes, whitespace, and lowercase
-  const colMap = {};
-  Object.keys(rows[0]).forEach(originalKey => {
-    const normalized = originalKey.trim().replace(/^\uFEFF/, '').replace(/\\/g, '').toLowerCase();
-    colMap[normalized] = originalKey;
-  });
-
-  // Column aliases: maps known synonyms to canonical column names
-  const COLUMN_ALIASES = {
-    case_id: ['case_id', 'case id', 'caseid', 'case', 'case_number', 'casenumber'],
-    activity: ['activity', 'event', 'activity_name', 'activityname', 'action', 'step', 'task', 'operation', 'event_name', 'eventname'],
-    timestamp: ['timestamp', 'time', 'date', 'datetime', 'event_time', 'eventtime', 'created_at', 'createdat']
-  };
-
-  // Resolve columns via alias matching
-  function findColumn(colMap, aliases) {
-    for (const alias of aliases) {
-      if (colMap[alias]) return alias;
-    }
-    return null;
-  }
-
-  const required = ['case_id', 'activity', 'timestamp'];
-  const resolvedColumns = {};
-  for (const col of required) {
-    const found = findColumn(colMap, COLUMN_ALIASES[col]);
-    if (!found) {
-      showUploadError('Missing required column: ' + col + '. Expected one of: ' + COLUMN_ALIASES[col].join(', '));
-      return;
-    }
-    resolvedColumns[col] = found;
-  }
-
-  // Parse and validate
-  const parsed = [];
-  let skippedRows = 0;
-  for (const row of rows) {
-    const caseId = String(row[colMap[resolvedColumns['case_id']]]).trim();
-    const activity = String(row[colMap[resolvedColumns['activity']]]).trim();
-    const tsStr = String(row[colMap[resolvedColumns['timestamp']]]).trim();
-    const ts = parseTimestamp(tsStr);
-    if (isNaN(ts.getTime())) {
-      skippedRows++;
-      continue;
-    }
-    if (caseId && activity) {
-      parsed.push({ caseId, activity, timestamp: ts });
-    }
-  }
-
-  if (skippedRows > 0) {
-    showInfoBanner(skippedRows + ' rows skipped due to invalid timestamps.');
-  }
-
-  if (parsed.length === 0) {
-    showUploadError('No valid rows found after parsing.');
-    return;
-  }
-
-  rawData = parsed;
-
-  // Show upload bar
-  uploadZone.style.display = 'none';
-  uploadBar.style.display = 'flex';
-  fileNameDisplay.textContent = fileName;
-  rowCountDisplay.textContent = parsed.length;
-
-  // Set default process name from uploaded file
-  const baseName = fileName.replace(/\.csv$/i, '');
-  document.getElementById('pmvProcessName').value = baseName;
-
-  // Process data
-  appState = processData(parsed);
-
-  // Compute max frequency and set slider range
-  maxFrequency = 0;
-  for (const [, ts] of appState.transitionStats) {
-    if (ts.frequency > maxFrequency) maxFrequency = ts.frequency;
-  }
-  freqFilterSlider.min = 0;
-  freqFilterSlider.max = maxFrequency;
-  freqFilterSlider.step = 1;
-  freqFilterPct = 0;
-  freqFilterSlider.value = 0;
-  freqFilterBar.style.display = 'flex';
-  const initialFiltered = applyFrequencyFilter(appState, 0);
-  updateFreqFilterLabel(initialFiltered, 0);
-
-  // Show panels FIRST so the flow graph container has a real clientWidth
-  statsBar.style.display = 'block';
-  panelsContainer.style.display = 'block';
-
-  // Render everything
-  renderStats(appState);
-  renderTransitionsTable(appState);
-  renderPathsTable(appState);
-  renderNodesTable(appState);
-  renderOutlierTable(appState);
-  renderIncompleteCases(appState);
-  renderFlowGraph(initialFiltered);
-}
-
-/* ================================================================
-   SECTION 3 — DATA PIPELINE
-   ================================================================ */
-function processData(rows) {
-  // 3.1 — already parsed above
-
-  // 3.2 — Build case map
-  const caseMap = new Map();
-  for (const row of rows) {
-    if (!caseMap.has(row.caseId)) {
-      caseMap.set(row.caseId, []);
-    }
-    caseMap.get(row.caseId).push({ activity: row.activity, timestamp: row.timestamp });
-  }
-
-  // Sort each case's events by timestamp ascending
-  for (const [caseId, events] of caseMap) {
-    events.sort((a, b) => a.timestamp - b.timestamp);
-  }
-
-  const totalCases = caseMap.size;
-  const totalEvents = rows.length;
-
-  // 3.3 — Extract Transitions
-  const transitionInstances = [];
-  for (const [caseId, events] of caseMap) {
-    for (let i = 0; i < events.length - 1; i++) {
-      const duration = (events[i + 1].timestamp - events[i].timestamp) / (1000 * 60); // minutes
-      transitionInstances.push({
-        caseId,
-        from: events[i].activity,
-        to: events[i + 1].activity,
-        duration
-      });
-    }
-  }
-
-  // 3.4 — Aggregate Transitions
-  const transitionMap = new Map();
-  for (const inst of transitionInstances) {
-    const key = inst.from + '\u2192' + inst.to;
-    if (!transitionMap.has(key)) {
-      transitionMap.set(key, { from: inst.from, to: inst.to, durations: [] });
-    }
-    transitionMap.get(key).durations.push(inst.duration);
-  }
-
-  const transitionStats = new Map();
-  for (const [key, data] of transitionMap) {
-    const durs = data.durations;
-    const n = durs.length;
-    const sum = durs.reduce((a, b) => a + b, 0);
-    const avg = sum / n;
-    const min = durs.reduce((a, b) => a < b ? a : b, durs[0]);
-    const max = durs.reduce((a, b) => a > b ? a : b, durs[0]);
-    const variance = durs.reduce((acc, v) => acc + (v - avg) ** 2, 0) / n;
-    const stdev = Math.sqrt(variance);
-    transitionStats.set(key, {
-      from: data.from,
-      to: data.to,
-      frequency: n,
-      avgDuration: avg,
-      minDuration: min,
-      maxDuration: max,
-      stdev: stdev
-    });
-  }
-
-  // 3.5 — Aggregate Nodes
-  const nodeMap = new Map();
-  for (const [caseId, events] of caseMap) {
-    const seen = new Set();
-    for (const ev of events) {
-      seen.add(ev.activity);
-    }
-    for (const act of seen) {
-      if (!nodeMap.has(act)) {
-        nodeMap.set(act, { casesThrough: new Set(), outgoingDurations: [] });
-      }
-      nodeMap.get(act).casesThrough.add(caseId);
-    }
-  }
-
-  // Collect outgoing durations per node
-  for (const inst of transitionInstances) {
-    if (!nodeMap.has(inst.from)) {
-      nodeMap.set(inst.from, { casesThrough: new Set(), outgoingDurations: [] });
-    }
-    nodeMap.get(inst.from).outgoingDurations.push(inst.duration);
-  }
-
-  const nodeStats = new Map();
-  for (const [activity, data] of nodeMap) {
-    const durs = data.outgoingDurations;
-    const avgTimeToNext = durs.length > 0 ? durs.reduce((a, b) => a + b, 0) / durs.length : 0;
-    nodeStats.set(activity, {
-      casesThrough: data.casesThrough.size,
-      avgTimeToNext: avgTimeToNext
-    });
-  }
-
-  // 3.6 — Aggregate Paths
-  const pathMap = new Map();
-  for (const [caseId, events] of caseMap) {
-    if (events.length < 2) continue;
-    const pathStr = events.map(e => e.activity).join('\u2192');
-    const totalDuration = (events[events.length - 1].timestamp - events[0].timestamp) / (1000 * 60);
-    if (!pathMap.has(pathStr)) {
-      pathMap.set(pathStr, { path: pathStr, frequencies: [], totalDurations: [] });
-    }
-    pathMap.get(pathStr).frequencies.push(caseId);
-    pathMap.get(pathStr).totalDurations.push(totalDuration);
-  }
-
-  const pathStats = [];
-  for (const [pathStr, data] of pathMap) {
-    const avgDur = data.totalDurations.reduce((a, b) => a + b, 0) / data.totalDurations.length;
-    pathStats.push({
-      path: pathStr,
-      frequency: data.frequencies.length,
-      avgDuration: avgDur
-    });
-  }
-  pathStats.sort((a, b) => b.frequency - a.frequency);
-
-  // 3.7 — Flag Outliers
-  const outliers = [];
-  for (const inst of transitionInstances) {
-    const key = inst.from + '\u2192' + inst.to;
-    const tStat = transitionStats.get(key);
-    if (!tStat || tStat.stdev === 0) continue;
-    const threshold = tStat.avgDuration + (2 * tStat.stdev);
-    if (inst.duration > threshold) {
-      outliers.push({
-        caseId: inst.caseId,
-        from: inst.from,
-        to: inst.to,
-        actualDuration: inst.duration,
-        avgDuration: tStat.avgDuration,
-        multiplier: inst.duration / tStat.avgDuration
-      });
-    }
-  }
-  outliers.sort((a, b) => b.multiplier - a.multiplier);
-
-  const outlierCaseIds = new Set(outliers.map(o => o.caseId));
-
-  // Identify terminal activity
-  const terminalCounts = new Map();
-  for (const [caseId, events] of caseMap) {
-    const last = events[events.length - 1].activity;
-    terminalCounts.set(last, (terminalCounts.get(last) || 0) + 1);
-  }
-  let terminalActivity = '';
-  let maxCount = 0;
-  for (const [act, count] of terminalCounts) {
-    if (count > maxCount) {
-      maxCount = count;
-      terminalActivity = act;
-    }
-  }
-
-  const incompleteCases = [];
-  for (const [caseId, events] of caseMap) {
-    if (events[events.length - 1].activity !== terminalActivity) {
-      incompleteCases.push(caseId);
-    }
-  }
-
-  // Avg case duration
-  let totalCaseDuration = 0;
-  let caseCount = 0;
-  for (const [caseId, events] of caseMap) {
-    if (events.length >= 2) {
-      const dur = (events[events.length - 1].timestamp - events[0].timestamp) / (1000 * 60 * 60); // hours
-      totalCaseDuration += dur;
-      caseCount++;
-    }
-  }
-  const avgCaseDuration = caseCount > 0 ? totalCaseDuration / caseCount : 0;
-
-  // Unique activities
-  const uniqueActivities = Array.from(nodeStats.keys());
-
-  // 3.8 — State Object
-  return {
-    totalCases,
-    uniqueActivities,
-    totalEvents,
-    avgCaseDuration,
-    transitionStats,
-    nodeStats,
-    pathStats,
-    outliers,
-    incompleteCases,
-    outlierCaseIds,
-    terminalActivity,
-    terminalActivities: terminalCounts
-  };
-}
-
-/* ================================================================
-   SECTION 4 — RENDER STATS BAR
-   ================================================================ */
-function renderStats(state) {
-  $('statTotalCases').textContent = state.totalCases;
-  $('statUniqueActivities').textContent = state.uniqueActivities.length;
-  $('statTotalEvents').textContent = state.totalEvents;
-  $('statAvgDuration').textContent = state.avgCaseDuration.toFixed(1) + 'h';
-  $('statOutlierCases').textContent = state.outlierCaseIds.size;
-}
-
-/* ================================================================
-   SECTION 5 — DATA DUMP TABLES
-   ================================================================ */
-
-// Tab switching
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    this.classList.add('active');
-    document.getElementById('tab' + this.dataset.tab.charAt(0).toUpperCase() + this.dataset.tab.slice(1)).classList.add('active');
-  });
-});
-
-// Generic sort function for tables
-function makeSortable(tableId, bodyId, defaultCol, defaultDir) {
-  let sortCol = defaultCol;
-  let sortDir = defaultDir;
-
-  function render(sortedData, col, dir) {
-    const tbody = document.getElementById(bodyId);
-    tbody.innerHTML = '';
-    for (const row of sortedData) {
-      tbody.appendChild(row.el);
-    }
-    // Update arrows — use the explicitly passed dir so the arrow is always in sync
-    const ths = document.querySelectorAll('#' + tableId + ' thead th');
-    ths.forEach(th => {
-      const arrow = th.querySelector('.sort-arrow');
-      if (th.dataset.col === col) {
-        arrow.textContent = dir === 'asc' ? '\u2191' : '\u2193';
-      } else {
-        arrow.textContent = '';
-      }
-    });
-  }
-
-  return {
-    setData: function(data, getValue) {
-      const rows = data.map(d => {
-        const el = d.el;
-        return { data: d, el: el };
-      });
-
-      function sort() {
-        rows.sort((a, b) => {
-          const va = getValue(a.data, sortCol);
-          const vb = getValue(b.data, sortCol);
-          if (typeof va === 'string') {
-            const cmp = va.localeCompare(vb);
-            return sortDir === 'asc' ? cmp : -cmp;
-          }
-          return sortDir === 'asc' ? va - vb : vb - va;
-        });
-        render(rows, sortCol, sortDir); // Bug 3 fix: pass sortDir explicitly
-      }
-
-      // Attach click handlers
-      document.querySelectorAll('#' + tableId + ' thead th').forEach(th => {
-        th.addEventListener('click', function() {
-          const col = this.dataset.col;
-          if (col === sortCol) {
-            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-          } else {
-            sortCol = col;
-            sortDir = 'desc';
-          }
-          sort();
-        });
-      });
-
-      sort();
-    }
-  };
-}
-
-/* Transitions Table */
-function renderTransitionsTable(state) {
-  const data = [];
-  for (const [key, ts] of state.transitionStats) {
-    const hasOutlier = state.outliers.some(o => o.from === ts.from && o.to === ts.to);
-    data.push({
-      key: key,
-      from: ts.from,
-      to: ts.to,
-      frequency: ts.frequency,
-      avgDuration: ts.avgDuration,
-      minDuration: ts.minDuration,
-      maxDuration: ts.maxDuration,
-      stdev: ts.stdev,
-      hasOutlier: hasOutlier
-    });
-  }
-
-  // Bug 2 fix: build d.el BEFORE calling sorter.setData() so render() has elements to append
-  for (const d of data) {
-    const tr = document.createElement('tr');
-    if (d.hasOutlier) tr.className = 'outlier-row';
-    tr.innerHTML =
-      '<td>' + d.from + ' \u2192 ' + d.to + '</td>' +
-      '<td class="num">' + d.frequency + '</td>' +
-      '<td class="num">' + d.avgDuration.toFixed(1) + '</td>' +
-      '<td class="num">' + d.minDuration.toFixed(1) + '</td>' +
-      '<td class="num">' + d.maxDuration.toFixed(1) + '</td>' +
-      '<td class="num">' + d.stdev.toFixed(1) + '</td>';
-    d.el = tr;
-  }
-
-  const sorter = makeSortable('transitionsTable', 'transitionsBody', 'frequency', 'desc');
-  sorter.setData(data, function(d, col) {
-    switch (col) {
-      case 'transition': return d.key;
-      case 'frequency': return d.frequency;
-      case 'avgDuration': return d.avgDuration;
-      case 'minDuration': return d.minDuration;
-      case 'maxDuration': return d.maxDuration;
-      case 'stdev': return d.stdev;
-      default: return 0;
-    }
-  });
-}
-
-/* Paths Table */
-function renderPathsTable(state) {
-  const totalCases = state.totalCases;
-  const data = state.pathStats.map((p, idx) => ({
-    path: p.path,
-    frequency: p.frequency,
-    pct: (p.frequency / totalCases) * 100,
-    avgDuration: p.avgDuration,
-    isHappyPath: idx === 0
-  }));
-
-  // Bug 2 fix: build d.el BEFORE calling sorter.setData()
-  for (const d of data) {
-    const tr = document.createElement('tr');
-    if (d.isHappyPath) tr.className = 'happy-path-row';
-    let pathDisplay = d.path.replace(/\u2192/g, ' \u2192 ');
-    let fullPath = pathDisplay;
-    if (pathDisplay.length > 60) {
-      pathDisplay = pathDisplay.substring(0, 57) + '...';
-    }
-    let badgeHtml = d.isHappyPath ? '<span class="happy-path-badge">Happy Path</span>' : '';
-    tr.innerHTML =
-      '<td title="' + fullPath.replace(/"/g, '&quot;') + '">' + pathDisplay + ' ' + badgeHtml + '</td>' +
-      '<td class="num">' + d.frequency + '</td>' +
-      '<td class="num">' + d.pct.toFixed(1) + '%</td>' +
-      '<td class="num">' + d.avgDuration.toFixed(1) + '</td>';
-    d.el = tr;
-  }
-
-  const sorter = makeSortable('pathsTable', 'pathsBody', 'cases', 'desc');
-  sorter.setData(data, function(d, col) {
-    switch (col) {
-      case 'path': return d.path;
-      case 'cases': return d.frequency;
-      case 'pct': return d.pct;
-      case 'avgDuration': return d.avgDuration;
-      default: return 0;
-    }
-  });
-}
-
-/* Nodes Table */
-function renderNodesTable(state) {
-  const data = [];
-  for (const [activity, ns] of state.nodeStats) {
-    data.push({
-      activity: activity,
-      casesThrough: ns.casesThrough,
-      avgTimeToNext: ns.avgTimeToNext
-    });
-  }
-
-  // Bug 2 fix: build d.el BEFORE calling sorter.setData()
-  for (const d of data) {
-    const tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td>' + d.activity + '</td>' +
-      '<td class="num">' + d.casesThrough + '</td>' +
-      '<td class="num">' + d.avgTimeToNext.toFixed(1) + '</td>';
-    d.el = tr;
-  }
-
-  const sorter = makeSortable('nodesTable', 'nodesBody', 'casesThrough', 'desc');
-  sorter.setData(data, function(d, col) {
-    switch (col) {
-      case 'activity': return d.activity;
-      case 'casesThrough': return d.casesThrough;
-      case 'avgTimeToNext': return d.avgTimeToNext;
-      default: return 0;
-    }
-  });
-}
-
-/* ================================================================
-   SECTION 6 — OUTLIER REPORT
-   ================================================================ */
-
-function renderOutlierTable(state) {
-  const outlierFilter = document.getElementById('outlierFilter');
-  const outlierBody = document.getElementById('outlierBody');
-  const outlierCountBadge = document.getElementById('outlierCountBadge');
-  const noOutliersMessage = document.getElementById('noOutliersMessage');
-
-  // Populate filter dropdown
-  const currentVal = outlierFilter.value;
-  outlierFilter.innerHTML = '<option value="all">All transitions</option>';
-  const uniqueTransitions = new Set();
-  for (const o of state.outliers) {
-    uniqueTransitions.add(o.from + ' \u2192 ' + o.to);
-  }
-  for (const t of uniqueTransitions) {
-    const opt = document.createElement('option');
-    opt.value = t;
-    opt.textContent = t;
-    outlierFilter.appendChild(opt);
-  }
-  outlierFilter.value = currentVal !== 'all' && uniqueTransitions.has(currentVal) ? currentVal : 'all';
-
-  if (state.outliers.length === 0) {
-    outlierBody.innerHTML = '';
-    outlierCountBadge.textContent = '0 flagged';
-    noOutliersMessage.style.display = 'block';
-    document.querySelector('.outlier-header').style.display = 'none';
-    document.querySelector('.filter-bar').style.display = 'none';
-    document.getElementById('outlierTable').style.display = 'none';
-    return;
-  }
-
-  noOutliersMessage.style.display = 'none';
-  document.querySelector('.outlier-header').style.display = 'flex';
-  document.querySelector('.filter-bar').style.display = 'block';
-  document.getElementById('outlierTable').style.display = '';
-
-  outlierCountBadge.textContent = state.outliers.length + ' flagged';
-
-  // Build data
-  const data = state.outliers.map(o => ({
-    caseId: o.caseId,
-    from: o.from,
-    to: o.to,
-    actualDuration: o.actualDuration,
-    avgDuration: o.avgDuration,
-    multiplier: o.multiplier,
-    transitionKey: o.from + ' \u2192 ' + o.to
-  }));
-
-  // Bug 2 fix: build d.el BEFORE calling sorter.setData()
-  // Bug 4 fix: store transitionKey as data-transition attribute so filter works after sorting
-  for (const d of data) {
-    const tr = document.createElement('tr');
-    let multiplierClass = 'multiplier-muted';
-    if (d.multiplier > 5) multiplierClass = 'multiplier-danger';
-    else if (d.multiplier >= 3) multiplierClass = 'multiplier-warning';
-    tr.dataset.transition = d.transitionKey;
-    tr.innerHTML =
-      '<td>' + d.caseId + '</td>' +
-      '<td>' + d.from + '</td>' +
-      '<td>' + d.to + '</td>' +
-      '<td class="num">' + d.actualDuration.toFixed(1) + '</td>' +
-      '<td class="num">' + d.avgDuration.toFixed(1) + '</td>' +
-      '<td class="num"><span class="' + multiplierClass + '">' + d.multiplier.toFixed(1) + '\u00D7</span></td>';
-    d.el = tr;
-  }
-
-  const sorter = makeSortable('outlierTable', 'outlierBody', 'multiplier', 'desc');
-  sorter.setData(data, function(d, col) {
-    switch (col) {
-      case 'caseId': return isNaN(Number(d.caseId)) ? String(d.caseId) : Number(d.caseId);
-      case 'from': return d.from;
-      case 'to': return d.to;
-      case 'actualDuration': return d.actualDuration;
-      case 'avgDuration': return d.avgDuration;
-      case 'multiplier': return d.multiplier;
-      default: return 0;
-    }
-  });
-
-  // Bug 4 fix: read transitionKey from the row's data-transition attribute
-  // so the filter is correct even after the user sorts the table
-  outlierFilter.onchange = function() {
-    const val = this.value;
-    outlierBody.querySelectorAll('tr').forEach(row => {
-      row.style.display = (val === 'all' || row.dataset.transition === val) ? '' : 'none';
-    });
-  };
-}
-
-function renderIncompleteCases(state) {
-  const incompleteBody = document.getElementById('incompleteBody');
-  const incompleteCountBadge = document.getElementById('incompleteCountBadge');
-  const incompleteExplanation = document.getElementById('incompleteExplanation');
-  const collapseIcon = document.getElementById('collapseIcon');
-  const incompleteHeader = document.getElementById('incompleteHeader');
-
-  incompleteCountBadge.textContent = state.incompleteCases.length;
-  incompleteBody.style.cssText = 'word-break:break-word;white-space:normal;max-height:160px;overflow-y:auto;';
-  incompleteBody.textContent = state.incompleteCases.join(', ');
-  incompleteExplanation.textContent = 'These cases did not reach ' + state.terminalActivity + ', the most common terminal activity.';
-
-  // Collapsible toggle
-  incompleteHeader.onclick = function() {
-    incompleteBody.classList.toggle('open');
-    collapseIcon.classList.toggle('open');
-  };
-}
-
-/* ================================================================
-   SECTION 7 — D3 FLOW GRAPH
-   ================================================================ */
-
-/* ── Frequency filter helper ── */
-function applyFrequencyFilter(state, threshold) {
-  if (!state) return state;
-
-  const filteredStats = new Map();
-  for (const [key, ts] of state.transitionStats) {
-    if (ts.frequency >= threshold) {
-      filteredStats.set(key, ts);
-    }
-  }
-
-  const activeNodes = new Set();
-  for (const [, ts] of filteredStats) {
-    activeNodes.add(ts.from);
-    activeNodes.add(ts.to);
-  }
-
-  const filteredActivities = state.uniqueActivities.filter(a => activeNodes.has(a));
-
-  return Object.assign({}, state, {
-    transitionStats: filteredStats,
-    uniqueActivities: filteredActivities
-  });
-}
-
-function renderFlowGraph(state, preserveZoom) {
-  const container = document.getElementById('flowGraphPanel');
-  // Container is visible by the time this runs, so clientWidth is accurate
-  const width = Math.max(container.clientWidth - 48, 200);
-  const height = 380; // Reduced from 460 to leave room for the legend
-
-  graphSvgEl.setAttribute('width', width);
-  graphSvgEl.setAttribute('height', height);
-
-  // Preserve zoom/pan state across re-renders (Fixes slider jitter)
-  const savedTransform = preserveZoom ? d3.zoomTransform(graphSvgEl) : null;
-
-  graphSvgEl.innerHTML = '';
-  // Re-attach zoom behavior — innerHTML = '' wipes the __zoom datum on the SVG
-  // element, so subsequent zoom.transform() calls would apply relative to an
-  // identity base instead of the saved transform, causing slider to jump.
-  d3.select(graphSvgEl).call(graphZoom);
-  const svg = d3.select(graphSvgEl);
-
-  // Build nodes and links
-  const nodes = [];
-  const nodeIndex = new Map();
-  for (const activity of state.uniqueActivities) {
-    const ns = state.nodeStats.get(activity) || { casesThrough: 0, avgTimeToNext: 0 };
-    const hasOutliers = state.outliers.some(o => o.from === activity || o.to === activity);
-    const isMainTerminal = activity === state.terminalActivity;
-    const isAltTerminal = !isMainTerminal && (state.terminalActivities ? state.terminalActivities.has(activity) : false);
-    const terminalCount = state.terminalActivities ? (state.terminalActivities.get(activity) || 0) : 0;
-    const node = {
-      id: activity,
-      casesThrough: ns.casesThrough,
-      avgTimeToNext: ns.avgTimeToNext,
-      hasOutliers: hasOutliers,
-      isMainTerminal: isMainTerminal,
-      isAltTerminal: isAltTerminal,
-      terminalCount: terminalCount
-    };
-    nodes.push(node);
-    nodeIndex.set(activity, node);
-  }
-
-  const links = [];
-  for (const [key, ts] of state.transitionStats) {
-    links.push({
-      source: ts.from,
-      target: ts.to,
-      frequency: ts.frequency,
-      avgDuration: ts.avgDuration,
-      stdev: ts.stdev
-    });
-  }
-
-  if (nodes.length === 0) return;
-
-  // ── Topological layered layout (BFS depth assignment) ────────────
-  const outEdges = new Map(nodes.map(n => [n.id, []]));
-  const inDegree = new Map(nodes.map(n => [n.id, 0]));
-  for (const l of links) {
-    if (outEdges.has(l.source)) outEdges.get(l.source).push(l.target);
-    inDegree.set(l.target, (inDegree.get(l.target) || 0) + 1);
-  }
-
-  // BFS from zero-in-degree nodes to assign column depth
-  const depthMap = new Map();
-  const queue = [];
-  for (const [id, deg] of inDegree) {
-    if (deg === 0) { depthMap.set(id, 0); queue.push(id); }
-  }
-  if (queue.length === 0) { depthMap.set(nodes[0].id, 0); queue.push(nodes[0].id); }
-
-  let head = 0;
-  while (head < queue.length) {
-    const cur = queue[head++];
-    const d = depthMap.get(cur) || 0;
-    for (const next of (outEdges.get(cur) || [])) {
-      if (!depthMap.has(next)) {          // first-visit only — cycle-safe
-        depthMap.set(next, d + 1);
-        queue.push(next);
-      }
-    }
-  }
-  for (const n of nodes) { if (!depthMap.has(n.id)) depthMap.set(n.id, 0); }
-
-  // Group nodes by column and assign x/y
-  const columns = new Map();
-  for (const n of nodes) {
-    const col = depthMap.get(n.id);
-    if (!columns.has(col)) columns.set(col, []);
-    columns.get(col).push(n);
-  }
-  let maxDepth = 0;
-  for (const v of depthMap.values()) { if (v > maxDepth) maxDepth = v; }
-  const colCount = maxDepth + 1;
-  // Scales
-  const freqExtent = d3.extent(links, d => d.frequency);
-  const strokeScale = d3.scaleLinear()
-    .domain([freqExtent[0] || 1, freqExtent[1] || 1])
-    .range([2, 12]);
-
-  const durExtent = d3.extent(links, d => d.avgDuration);
-  const colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
-    .domain([durExtent[1] || 1, durExtent[0] || 0]);
-
-  const maxStroke = d3.max(links, d => strokeScale(d.frequency)) || 2;
-  const minColW = 180 + maxStroke * 8; 
-  const colW = Math.max(width / Math.max(1, colCount), minColW);
-  const minRowH = 80;
-  
-  for (const [col, colNodes] of columns) {
-    const x = colW * col + colW / 2;
-    const currentH = Math.max(height, colNodes.length * minRowH);
-    const rowH = currentH / (colNodes.length + 1);
-    colNodes.forEach((n, i) => { n.x = x; n.y = rowH * (i + 1); });
-  }
-
-  // SVG defs for arrowhead — one unique marker per link (color matches edge)
-  // refX=0 places the triangle BASE at the path end-point; pullback=arrowLen trims the
-  // path so the tip lands exactly at the node border without the stroke overlapping it.
-  const defs = svg.append('defs');
-  links.forEach((link, i) => {
-    const sw = strokeScale(link.frequency);
-    const arrowW = Math.max(8, sw + 8); 
-    const arrowLen = arrowW * 1.2; 
-
-    defs.append('marker')
-      .attr('id', 'arrowhead-' + i)
-      .attr('viewBox', `0 -${arrowW/2} ${arrowLen} ${arrowW}`)
-      .attr('refX', 0)
-      .attr('refY', 0)
-      .attr('markerWidth', arrowLen)
-      .attr('markerHeight', arrowW)
-      .attr('markerUnits', 'userSpaceOnUse')
-      .attr('orient', 'auto')
-      .append('path')
-      .attr('d', `M0,-${arrowW/2} L${arrowLen},0 L0,${arrowW/2}`)
-      .attr('fill', colorScale(link.avgDuration));
-      
-    link.markerId = 'arrowhead-' + i;
-    link.pullback = arrowLen - 1; // Slight overlap to prevent visual gaps
-  });
-
-  // Zoomable/pannable group that wraps all graph content
-  // NOTE: graphZoom is created once at module level to avoid accumulating listeners
-  const g = svg.append('g').attr('class', 'graph-content');
-
-  // ── Helper: path from the edge of source rect → edge of target rect ──
-  const NODE_RW = 62, NODE_RH = 22;
-  const reverseSet = new Set(links.map(l => l.target + '|' + l.source));
-
-  function edgePath(l) {
-    const s = nodeIndex.get(l.source);
-    const t = nodeIndex.get(l.target);
-    if (!s || !t) return '';
-    const dx = t.x - s.x, dy = t.y - s.y;
-    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-    const ux = dx / dist, uy = dy / dist;
-    const tExit = Math.min(ux !== 0 ? NODE_RW / Math.abs(ux) : Infinity, uy !== 0 ? NODE_RH / Math.abs(uy) : Infinity);
-    const sx = s.x + ux * tExit, sy = s.y + uy * tExit;
-    const tEnt = Math.min(ux !== 0 ? NODE_RW / Math.abs(ux) : Infinity, uy !== 0 ? NODE_RH / Math.abs(uy) : Infinity) + (l.pullback || 12);
-    const tx2 = t.x - ux * tEnt, ty2 = t.y - uy * tEnt;
-    
-    const pathLen = Math.sqrt(Math.pow(tx2 - sx, 2) + Math.pow(ty2 - sy, 2)) || 1;
-    
-    // Use bow if there's a reverse edge, OR if it's not strictly horizontal
-    let bow = 0;
-    if (reverseSet.has(l.source + '|' + l.target)) bow = Math.max(20, pathLen * 0.15);
-    else if (Math.abs(dy) > 30) bow = Math.max(15, pathLen * 0.1);
-
-    const cx = (sx + tx2) / 2 + (-uy) * bow;
-    const cy = (sy + ty2) / 2 + (ux) * bow;
-    return `M${sx},${sy} Q${cx},${cy} ${tx2},${ty2}`;
-  }
-
-  // ── Draw links ───────────────────────────────────────────────────
-  const linkGroup = g.append('g').attr('class', 'links');
-  const linkElements = linkGroup.selectAll('path')
-    .data(links)
-    .enter().append('path')
-    .attr('fill', 'none')
-    .attr('stroke', d => colorScale(d.avgDuration))
-    .attr('stroke-width', d => strokeScale(d.frequency))
-    .attr('opacity', 0.85)
-    .attr('marker-end', d => `url(#${d.markerId})`)
-    .attr('d', d => edgePath(d));
-
-  // ── Draw nodes ───────────────────────────────────────────────────
-  const nodeGroup = g.append('g').attr('class', 'nodes');
-  const nodeElements = nodeGroup.selectAll('g')
-    .data(nodes)
-    .enter().append('g')
-    .attr('transform', d => `translate(${d.x},${d.y})`);
-
-  nodeElements.append('rect')
-    .attr('x', -60).attr('y', -20)
-    .attr('width', 120).attr('height', 40)
-    .attr('rx', 6)
-    .attr('fill', d => d.isMainTerminal ? 'var(--node-terminal-fill)' : d.isAltTerminal ? 'var(--node-alt-terminal-fill)' : 'var(--node-fill)')
-    .attr('stroke', d => {
-      if (d.isMainTerminal) return 'var(--node-terminal-border)';
-      if (d.isAltTerminal)  return 'var(--node-alt-terminal-border)';
-      if (d.hasOutliers)    return 'var(--node-outlier-border)';
-      return 'var(--node-border)';
-    })
-    .attr('stroke-width', d => (d.isMainTerminal || d.isAltTerminal || d.hasOutliers) ? 2.5 : 1.5);
-
-  nodeElements.append('text')
-    .attr('text-anchor', 'middle')
-    .attr('dy', '0.35em')
-    .attr('fill', 'var(--node-text)')
-    .attr('font-size', '12px')
-    .attr('pointer-events', 'none')
-    .text(d => d.id.length > 14 ? d.id.substring(0, 13) + '\u2026' : d.id);
-
-  // ── Tooltips ─────────────────────────────────────────────────────
-  const tip = document.getElementById('tooltip');
-
-  nodeElements
-    .on('mouseover', (event, d) => {
-      tip.style.display = 'block';
-      let terminalInfo = '';
-      if (d.isMainTerminal) terminalInfo = '<br><span style="color:#27AE60;font-weight:600">&#10003; Main terminal &mdash; ' + d.terminalCount + ' cases end here</span>';
-      else if (d.isAltTerminal) terminalInfo = '<br><span style="color:#9B59B6;font-weight:600">&#9654; Alt terminal &mdash; ' + d.terminalCount + ' cases end here</span>';
-      tip.innerHTML = '<strong>' + d.id + '</strong><br>Cases through: ' + d.casesThrough + '<br>Avg time to next: ' + d.avgTimeToNext.toFixed(1) + ' min' + terminalInfo;
-    })
-    .on('mousemove', event => { tip.style.left = (event.clientX + 12) + 'px'; tip.style.top = (event.clientY + 12) + 'px'; })
-    .on('mouseout', () => { tip.style.display = 'none'; });
-
-  linkElements
-    .on('mouseover', (event, d) => {
-      tip.style.display = 'block';
-      tip.innerHTML = '<strong>' + d.source + ' \u2192 ' + d.target + '</strong><br>Frequency: ' + d.frequency + ' cases<br>Avg Duration: ' + d.avgDuration.toFixed(1) + ' min<br>Std Dev: ' + d.stdev.toFixed(1) + ' min';
-    })
-    .on('mousemove', event => { tip.style.left = (event.clientX + 12) + 'px'; tip.style.top = (event.clientY + 12) + 'px'; })
-    .on('mouseout', () => { tip.style.display = 'none'; });
-
-  // ── Auto-fit to viewport (or restore saved zoom/pan) ──────────────
-  if (savedTransform && savedTransform.k && savedTransform.k > 0 && !isNaN(savedTransform.x)) {
-    // Preserve the user's current zoom/pan state (slider-triggered re-render)
-    svg.call(graphZoom.transform, savedTransform);
-  } else {
-    // First render or reset — auto-fit all nodes into view
-    const PAD = 36;
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    for (const n of nodes) {
-      minX = Math.min(minX, n.x - 60); maxX = Math.max(maxX, n.x + 60);
-      minY = Math.min(minY, n.y - 20); maxY = Math.max(maxY, n.y + 20);
-    }
-    const gW = maxX - minX || 1, gH = maxY - minY || 1;
-    const minScale = 0.75;
-    let fitScale = Math.min((width - PAD * 2) / gW, (height - PAD * 2) / gH, 1.5);
-    let ftx, fty;
-    
-    if (fitScale < minScale) {
-      fitScale = minScale;
-      ftx = PAD - minX * fitScale;
-      fty = PAD - minY * fitScale;
-    } else {
-      ftx = (width - gW * fitScale) / 2 - minX * fitScale;
-      fty = (height - gH * fitScale) / 2 - minY * fitScale;
-    }
-    
-    svg.call(graphZoom.transform, d3.zoomIdentity.translate(ftx, fty).scale(fitScale));
-  }
-}
-
-/* ── Frequency filter slider wiring ── */
-const freqFilterSlider = document.getElementById('freqFilterSlider');
-const freqFilterValue  = document.getElementById('freqFilterValue');
-const freqFilterStats  = document.getElementById('freqFilterStats');
-const freqFilterBar    = document.getElementById('freqFilterBar');
-
-function updateFreqFilterLabel(filteredState, threshold) {
-  freqFilterValue.textContent = threshold;
-  const edgeCount = filteredState.transitionStats.size;
-  const nodeCount = filteredState.uniqueActivities.length;
-  freqFilterStats.textContent = edgeCount + ' edge' + (edgeCount !== 1 ? 's' : '') +
-    ', ' + nodeCount + ' node' + (nodeCount !== 1 ? 's' : '') + ' visible';
-}
-
-/* ── Slider: instant labels + rAF-throttled graph rebuild during drag ── *
- * Using requestAnimationFrame instead of debounce avoids main-thread
- * blocking: the render is deferred to just before the next paint cycle,
- * so input events are never queued behind a heavy innerHTML="" + D3
- * rebuild.  Only the latest filtered state is rendered (intermediate
- * frames are dropped).                                                     */
-let _pendingRenderId = null;
-let _pendingState   = null;
-
-function scheduleGraphRender(filtered) {
-  _pendingState = filtered;               // always keep the latest
-  if (_pendingRenderId) return;           // one rAF already queued
-  _pendingRenderId = requestAnimationFrame(() => {
-    _pendingRenderId = null;
-    const state = _pendingState;
-    _pendingState = null;
-    renderFlowGraph(state, true);
-  });
-}
-
-freqFilterSlider.addEventListener('input', function() {
-  freqFilterPct = Number(this.value);
-  if (!appState) return;
-  const filtered = applyFrequencyFilter(appState, freqFilterPct);
-  updateFreqFilterLabel(filtered, freqFilterPct);
-  scheduleGraphRender(filtered);
-});
-
-/* ================================================================
-   SECTION 8 — AI ANALYSIS
-   ================================================================ */
-
-// Load saved config
-const aiEndpoint = document.getElementById('aiEndpoint');
-const aiModel = document.getElementById('aiModel');
-const aiApiKey = document.getElementById('aiApiKey');
-const aiToggle = document.getElementById('aiToggle');
-const aiConfigBar = document.getElementById('aiConfigBar');
-const aiStatusBadge = document.getElementById('aiStatusBadge');
-const aiDefaultState = document.getElementById('aiDefaultState');
-const aiLoadingState = document.getElementById('aiLoadingState');
-const aiRenderedState = document.getElementById('aiRenderedState');
-const aiErrorState = document.getElementById('aiErrorState');
-const aiErrorMessage = document.getElementById('aiErrorMessage');
-const aiContent = document.getElementById('aiContent');
-const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
-const aiRegenerateBtn = document.getElementById('aiRegenerateBtn');
-const aiRetryBtn = document.getElementById('aiRetryBtn');
-
-// Load from localStorage
-if (localStorage.getItem('custom_endpoint')) aiEndpoint.value = localStorage.getItem('custom_endpoint');
-if (localStorage.getItem('custom_model')) aiModel.value = localStorage.getItem('custom_model');
-if (localStorage.getItem('gemini_api_key')) aiApiKey.value = localStorage.getItem('gemini_api_key');
-
-aiToggle.addEventListener('change', function() {
-  aiConfigBar.classList.toggle('open', this.checked);
-  if (this.checked) {
-    aiStatusBadge.textContent = 'Custom API';
-    aiStatusBadge.className = 'ai-status-badge custom';
-  } else {
-    aiStatusBadge.textContent = 'Proxy Active';
-    aiStatusBadge.className = 'ai-status-badge proxy';
-  }
-});
-
-// Save config on input
-aiEndpoint.addEventListener('input', () => localStorage.setItem('custom_endpoint', aiEndpoint.value));
-aiModel.addEventListener('input', () => localStorage.setItem('custom_model', aiModel.value));
-aiApiKey.addEventListener('input', () => localStorage.setItem('gemini_api_key', aiApiKey.value));
-
-function showAiState(state) {
-  aiDefaultState.style.display = state === 'default' ? 'block' : 'none';
-  aiLoadingState.style.display = state === 'loading' ? 'block' : 'none';
-  aiRenderedState.style.display = state === 'rendered' ? 'block' : 'none';
-  aiErrorState.style.display = state === 'error' ? 'block' : 'none';
-}
-
-async function callAiAnalysis() {
-  if (!appState) return;
-
-  const useProxy = !aiToggle.checked;
-  const customUrl = aiEndpoint.value.trim();
-  const customModel = aiModel.value.trim();
-  const apiKey = aiApiKey.value.trim();
-
-  // Build user message
-  const topPaths = appState.pathStats.slice(0, 5);
-  const transitionsStr = [];
-  for (const [key, ts] of appState.transitionStats) {
-    transitionsStr.push(key + ' | Freq: ' + ts.frequency + ' | Avg: ' + ts.avgDuration.toFixed(1) + 'min | StDev: ' + ts.stdev.toFixed(1) + 'min');
-  }
-  const topOutliers = appState.outliers.slice(0, 10);
-
-  let userMessage = 'Total Cases: ' + appState.totalCases + '\n';
-  userMessage += 'Avg Case Duration: ' + appState.avgCaseDuration.toFixed(1) + ' hours\n\n';
-  userMessage += 'TOP 5 PATHS BY FREQUENCY:\n';
-  userMessage += topPaths.map(p => p.path + ' | ' + p.frequency + ' cases (' + ((p.frequency / appState.totalCases) * 100).toFixed(1) + '%) | Avg ' + p.avgDuration.toFixed(1) + ' min').join('\n') + '\n\n';
-  userMessage += 'ALL TRANSITIONS:\n';
-  userMessage += transitionsStr.join('\n') + '\n\n';
-  userMessage += 'TOP 10 OUTLIERS BY MULTIPLIER:\n';
-  userMessage += topOutliers.map(o => 'Case ' + o.caseId + ': ' + o.from + '\u2192' + o.to + ' | ' + o.actualDuration.toFixed(1) + 'min vs avg ' + o.avgDuration.toFixed(1) + 'min (' + o.multiplier.toFixed(1) + '\u00D7)').join('\n') + '\n\n';
-  userMessage += 'Incomplete cases: ' + appState.incompleteCases.length + ' of ' + appState.totalCases;
-
-  showAiState('loading');
-
-  try {
-    let endpoint, body;
-
-    if (useProxy) {
-      endpoint = PROXY_URL;
-      body = {
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 8000 }
-      };
-    } else {
-      endpoint = customUrl || 'https://api.openai.com/v1/chat/completions';
-      body = {
-        model: customModel || 'gpt-4o',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: userMessage }
-        ],
-        temperature: 0.7
-      };
-    }
-
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(useProxy ? {} : { 'Authorization': 'Bearer ' + apiKey })
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!res.ok) {
-      throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-    }
-
-    const data = await res.json();
-
-    if (data.error) {
-      throw new Error(data.error.message || JSON.stringify(data.error));
-    }
-
-    let reply = '';
-    if (useProxy) {
-      reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
-    } else {
-      reply = data.choices?.[0]?.message?.content
-           || data.candidates?.[0]?.content?.parts?.[0]?.text
-           || 'No response received.';
-    }
-    lastAiResponseText = reply;  // cache for payload building
-
-    // Render with marked + DOMPurify
-    let html;
-    if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
-      html = DOMPurify.sanitize(marked.parse(reply));
-    } else {
-      html = reply.replace(/</g, '<').replace(/>/g, '>').replace(/\n/g, '<br>');
-    }
-
-    // Wrap in sections
-    aiContent.innerHTML = html;
-    showAiState('rendered');
-
-  } catch (err) {
-    if (useProxy) {
-      aiErrorMessage.innerHTML = 'Connection failed. Please provide your own <span class="ai-toggle-link" id="aiToggleLink">Custom API Key</span> to continue.';
-      showAiState('error');
-      const toggleLink = document.getElementById('aiToggleLink');
-      if (toggleLink) {
-        toggleLink.addEventListener('click', function() {
-          aiToggle.checked = true;
-          aiToggle.dispatchEvent(new Event('change'));
-          aiConfigBar.classList.add('open');
-        });
-      }
-    } else {
-      aiErrorMessage.textContent = 'Analysis failed. Check your API key and try again.';
-      showAiState('error');
-    }
-  }
-}
-
-aiAnalyzeBtn.addEventListener('click', callAiAnalysis);
-aiRegenerateBtn.addEventListener('click', callAiAnalysis);
-aiRetryBtn.addEventListener('click', callAiAnalysis);
-
-document.getElementById('btnSendToPDD').addEventListener('click', sendToPDD);
-document.getElementById('btnSendToAgentic').addEventListener('click', sendToAgentic);
-document.getElementById('btnSendToAssessment').addEventListener('click', sendToAssessment);
-
-/* ================================================================
-   INIT — Check for saved custom key toggle state
-   ================================================================ */
-// If there's a saved API key, show config bar
-if (localStorage.getItem('gemini_api_key')) {
-  aiToggle.checked = true;
-  aiConfigBar.classList.add('open');
-  aiStatusBadge.textContent = 'Custom API';
-  aiStatusBadge.className = 'ai-status-badge custom';
-}
-</script>
 </body>
 </html>
