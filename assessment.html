@@ -724,6 +724,36 @@
         .btn-roi:hover {
             background: #165a39;
         }
+
+        /* ── Incomplete section highlighting ── */
+        .section.incomplete {
+            border-color: var(--danger) !important;
+            border-left: 4px solid var(--danger) !important;
+            background: #FFF8F7;
+        }
+
+        .section .missing-badge {
+            display: none;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--danger);
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-left: 10px;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .section.incomplete .missing-badge {
+            display: inline;
+        }
+
+        .missing-field {
+            border-color: var(--danger) !important;
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15) !important;
+        }
     </style>
 </head>
 <body>
@@ -789,7 +819,7 @@
         <!-- INPUT TYPES -->
         <div class="card section" id="section-input-types">
             <div class="section-header">
-                <h2>Input Types</h2>
+                <h2>Input Types<span class="missing-badge">⚠ Missing</span></h2>
                 <div class="section-desc">Eliminatory — failure halts the assessment</div>
             </div>
 
@@ -822,7 +852,7 @@
         <!-- PROCESS STABILITY -->
         <div class="card section" id="section-process-stability">
             <div class="section-header">
-                <h2>Process Stability</h2>
+                <h2>Process Stability<span class="missing-badge">⚠ Missing</span></h2>
                 <div class="section-desc">Postponement — significant change defers the assessment</div>
             </div>
 
@@ -843,7 +873,7 @@
         <!-- APPLICATIONS STABILITY -->
         <div class="card section" id="section-apps-stability">
             <div class="section-header">
-                <h2>Applications Stability</h2>
+                <h2>Applications Stability<span class="missing-badge">⚠ Missing</span></h2>
                 <div class="section-desc">Postponement — significant change defers the assessment</div>
             </div>
 
@@ -864,7 +894,7 @@
         <!-- BENEFITS -->
         <div class="card section" id="section-benefits">
             <div class="section-header">
-                <h2>Benefits</h2>
+                <h2>Benefits<span class="missing-badge">⚠ Missing</span></h2>
                 <div class="section-desc">Volume and frequency data used to calculate bandwidth freed</div>
             </div>
 
@@ -922,7 +952,7 @@
         <!-- PROCESS COMPLEXITY -->
         <div class="card section" id="section-complexity">
             <div class="section-header">
-                <h2>Process Complexity</h2>
+                <h2>Process Complexity<span class="missing-badge">⚠ Missing</span></h2>
                 <div class="section-desc">Contributes to Implementation Effort score</div>
             </div>
 
@@ -982,7 +1012,7 @@
         <!-- INPUT DATA -->
         <div class="card section" id="section-input-data">
             <div class="section-header">
-                <h2>Input Data</h2>
+                <h2>Input Data<span class="missing-badge">⚠ Missing</span></h2>
                 <div class="section-desc">Data quality and structure impact Benefit score</div>
             </div>
 
@@ -1306,6 +1336,25 @@
     form.addEventListener('input', calculate);
     form.addEventListener('change', calculate);
 
+    // Clear incomplete highlights when fields are filled
+    form.addEventListener('input', function(e) {
+        const field = e.target;
+        if (!field.matches('select, input[type="number"]')) return;
+        if (field.classList.contains('missing-field') && field.value) {
+            field.classList.remove('missing-field');
+            const section = field.closest('.section');
+            if (!section) return;
+            // Check if ANY required field in this section is still empty
+            const skipIds = ['q_errors', 'q_peaks'];
+            const stillMissing = section.querySelectorAll('.question-group select, .question-group input[type="number"]');
+            let hasMissing = false;
+            stillMissing.forEach(el => {
+                if (!skipIds.includes(el.id) && !el.value) hasMissing = true;
+            });
+            if (!hasMissing) section.classList.remove('incomplete');
+        }
+    });
+
     // ── Send to PDD / Agent Planner ───────────────────────────────────────
     function getAssessmentParams() {
         const processName  = document.getElementById('q_process_name').value.trim();
@@ -1467,16 +1516,26 @@ Your job is to:
             return;
         }
 
-        let formIncomplete = false;
-        const skipIds = ['q_employees', 'q_errors', 'q_peaks'];
+        // Check for incomplete sections and highlight them
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('incomplete'));
+        document.querySelectorAll('.missing-field').forEach(el => el.classList.remove('missing-field'));
+
+        const skipIds = ['q_errors', 'q_peaks'];
+        const incompleteSections = new Set();
+
         document.querySelectorAll('.question-group select, .question-group input[type="number"]').forEach(input => {
             if (!skipIds.includes(input.id) && !input.value) {
-                formIncomplete = true;
+                input.classList.add('missing-field');
+                const section = input.closest('.section');
+                if (section) incompleteSections.add(section);
             }
         });
 
-        if (formIncomplete) {
-            alert("Please complete all numeric and dropdown fields in the assessment before generating an AI recommendation.");
+        if (incompleteSections.size > 0) {
+            incompleteSections.forEach(s => s.classList.add('incomplete'));
+            const first = [...incompleteSections][0];
+            first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            showToast(`⚠ ${incompleteSections.size} section(s) still need your input — highlighted below.`);
             return;
         }
 
@@ -1592,7 +1651,8 @@ ${contextData}`;
         alertEliminatory.style.display = 'none';
         alertPostponement.style.display = 'none';
         document.body.classList.remove('form-halted');
-        document.querySelectorAll('.section').forEach(el => el.classList.remove('active-gate'));
+        document.querySelectorAll('.section').forEach(el => { el.classList.remove('active-gate'); el.classList.remove('incomplete'); });
+        document.querySelectorAll('.missing-field').forEach(el => el.classList.remove('missing-field'));
         calculate();
         _cached_pmv = null;
         document.getElementById('pmv-import-banner').style.display = 'none';
