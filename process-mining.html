@@ -1776,7 +1776,7 @@ async function callAiAnalysis() {
     if (useProxy) {
       endpoint = PROXY_URL;
       body = {
-        model: 'deepseek-chat',
+        model: 'deepseek-v4-flash',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: userMessage }
