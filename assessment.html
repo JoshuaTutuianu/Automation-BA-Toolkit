@@ -1577,9 +1577,12 @@ ${contextData}`;
             if (useProxy) {
                 endpoint = PROXY_URL;
                 body = {
-                    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 8000 }
+                    model: 'deepseek-chat',
+                    messages: [
+                        { role: 'system', content: SYSTEM_PROMPT },
+                        { role: 'user', content: prompt }
+                    ],
+                    temperature: 0.7
                 };
             } else {
                 endpoint = customUrl || 'https://api.openai.com/v1/chat/completions';
@@ -1607,7 +1610,7 @@ ${contextData}`;
 
             let reply = '';
             if (useProxy) {
-                reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+                reply = data.choices?.[0]?.message?.content || 'No response received.';
             } else {
                 reply = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
             }

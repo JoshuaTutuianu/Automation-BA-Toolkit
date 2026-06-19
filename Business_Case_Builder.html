@@ -1482,16 +1482,19 @@ Your job is to:
                 let endpoint, body;
 
                 if (useProxy) {
-                    // Proxy mode (Gemini format)
+                    // Proxy mode (OpenAI-compatible format for DeepSeek)
                     endpoint = PROXY_URL;
-                    const geminiHistory = conversationHistory.map(msg => ({
-                        role: msg.role === 'ai' ? 'model' : msg.role,
-                        parts: [{ text: msg.content }]
-                    }));
+                    const messages = [
+                        { role: 'system', content: SYSTEM_PROMPT },
+                        ...conversationHistory.map(msg => ({
+                            role: msg.role === 'ai' ? 'assistant' : msg.role,
+                            content: msg.content
+                        }))
+                    ];
                     body = {
-                        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                        contents: geminiHistory,
-                        generationConfig: { temperature: 0.7, maxOutputTokens: 8000 }
+                        model: 'deepseek-chat',
+                        messages: messages,
+                        temperature: 0.7
                     };
                 } else {
                     // Manual mode (OpenAI-compatible format)
@@ -1528,7 +1531,7 @@ Your job is to:
                 } else {
                     let reply = '';
                     if (useProxy) {
-                        reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+                        reply = data.choices?.[0]?.message?.content || 'No response received.';
                     } else {
                         reply = data.choices?.[0]?.message?.content || data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
                     }
